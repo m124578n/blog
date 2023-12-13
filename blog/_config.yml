@@ -107,4 +107,7 @@ theme: hexo-theme-Claudia
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: git
+  repo: https://github.com/m124578n/m124578n.github.io.git
+  branch: master
+  
