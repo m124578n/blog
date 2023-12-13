@@ -109,4 +109,4 @@ theme: hexo-theme-Claudia
 deploy:
   type: git
   repo: https://github.com/m124578n/blog.git
-  branch: main
+  branch: master
