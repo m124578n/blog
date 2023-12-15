@@ -3,8 +3,8 @@ archive:
   other: '文章列表'
 
 category:
-  one: '種類'
-  other: '種類'
+  one: '分類'
+  other: '分類'
 tag:
   one: '標籤'
   other: '標籤'
