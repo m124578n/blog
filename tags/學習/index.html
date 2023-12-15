@@ -4,10 +4,10 @@
 本系列會著重在紀錄學習Python的筆記，如果有任何問題或是錯誤的地方，可以直接留言或私訊我，自學錯誤很難看到問題點，還請各位多多指教。
 Python Magic Method 直接翻譯就叫”魔法方法 or 魔術方法”，這個神奇的方法也就是雙底線開頭雙底線結尾，我們常見要定義class屬性時使用的__init__也是Magic Method～，然後我會看Python的document然後一個一個去了解Magic Method到底在做什麼以及怎麼使用。
 
-object.new(cls[, …])
+object.__new__(cls[, …])
 new
 
-Called to create a new instance of class cls. new() is a static method (special-cased so you need not ..</p><a class="button is-default mt-2 has-text-weight-semibold" href="/blog/2023/05/15/%E5%AD%B8%E7%BF%92%E7%AD%86%E8%A8%98_python_magic_methods_part1/">Read more</a></section></article></section><aside class="column is-hidden-mobile is-4-tablet is-3-widescreen"><div style="position: sticky; top: 50px;"><main class="aside-card-container tag-widget is-in-tag-page"><h3>標籤</h3><section><a href="/blog/tags/%E5%AD%B8%E7%BF%92"><span class="tag post-item-tag" style="margin-bottom: 5px;">學習</span></a></section></main></div></aside></div></article><script>$claudia.fadeInImage(null, $claudia.blurBackdropImg)
+Called to create a new instance of class cls. __new__() is a static method (special-cased so you n..</p><a class="button is-default mt-2 has-text-weight-semibold" href="/blog/2023/05/15/%E5%AD%B8%E7%BF%92%E7%AD%86%E8%A8%98_python_magic_methods_part1/">Read more</a></section></article></section><aside class="column is-hidden-mobile is-4-tablet is-3-widescreen"><div style="position: sticky; top: 50px;"><main class="aside-card-container tag-widget is-in-tag-page"><h3>標籤</h3><section><a href="/blog/tags/%E5%AD%B8%E7%BF%92"><span class="tag post-item-tag" style="margin-bottom: 5px;">學習</span></a></section></main></div></aside></div></article><script>$claudia.fadeInImage(null, $claudia.blurBackdropImg)
 
 window.addEventListener('resize', $claudia.throttle(function () {
     var images = document.querySelectorAll('.js-img-fadeIn')
