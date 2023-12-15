@@ -9,14 +9,14 @@ tags: 學習
 本系列會著重在紀錄學習Python的筆記，如果有任何問題或是錯誤的地方，可以直接留言或私訊我，自學錯誤很難看到問題點，還請各位多多指教。
 
 
-Python Magic Method 直接翻譯就叫"魔法方法 or 魔術方法"，這個神奇的方法也就是雙底線開頭雙底線結尾，我們常見要定義class屬性時使用的__init__也是Magic Method～，然後我會看Python的document然後一個一個去了解Magic Method到底在做什麼以及怎麼使用。
+Python Magic Method 直接翻譯就叫"魔法方法 or 魔術方法"，這個神奇的方法也就是雙底線開頭雙底線結尾，我們常見要定義class屬性時使用的\_\_init__也是Magic Method～，然後我會看Python的document然後一個一個去了解Magic Method到底在做什麼以及怎麼使用。
 
 ---
-### object.__new__(cls[, …])
+### object.\_\_new__(cls[, …])
 + new
-+ Called to create a new instance of class cls. __new__() is a static method (special-cased so you need not declare it as such) that takes the class of which an instance was requested as its first argument.
++ Called to create a new instance of class cls. \_\_new__() is a static method (special-cased so you need not declare it as such) that takes the class of which an instance was requested as its first argument.
 
-+ 這__new__ 會在__init__ 之前執行， 其主要功能是實例__init__所指定的屬性。 如果__new__沒有return cls 則__new__不會被調用。 
++ \_\_new__ 會在\_\_init__ 之前執行， 其主要功能是實例\_\_init__所指定的屬性。 如果\_\_new__沒有return cls 則\_\_new__不會被調用。 
 以下是範例：
 ```python
 # new會在init前執行
@@ -60,11 +60,11 @@ print(s2)
 ```
 ---
 
-### object.__init__(self[, …])
+### object.\_\_init__(self[, …])
 + initialization
-+ Called after the instance has been created (by __new__()), but before it is returned to the caller. The arguments are those passed to the class constructor expression.
-+ this__new__() to create it, and__init__() to customize it
-__init__就是大家常見的定義該物件屬性的方式了。
++ Called after the instance has been created (by \_\_new__()), but before it is returned to the caller. The arguments are those passed to the class constructor expression.
++ \_\_new__() to create it, and \_\_init__() to customize it
+\_\_init__就是大家常見的定義該物件屬性的方式了。
 
 ```python
 # 在new出物件時可以透過init來指定該物件所擁有的屬性
@@ -83,15 +83,15 @@ print(p2.name, p2.age, p2.say_something)
 # John 25 change the default
 ```
 
-+ 不過據我所知好像有滿多奇妙的操作可以在__init__完成，畢竟new出一個物件的時候執行完__new__就會執行__init__，根據不同的使用情境或許能有不同的操作物件。（待學習….）
++ 不過據我所知好像有滿多奇妙的操作可以在 \_\_init__ 完成，畢竟new出一個物件的時候執行完 \_\_new__ 就會執行 \_\_init__，根據不同的使用情境或許能有不同的操作物件。（待學習….）
 
 ---
-### object.__del__(self)
+### object.\_\_del__(self)
 + Called when the instance is about to be destroyed.
-+ __del__當該物件被消除時會call到這個magic method 
++ \_\_del__當該物件被消除時會call到這個magic method 
 + 根據官方文件表示：
-    + del x doesn't directly call x.__del__() - the former decrements the reference count for x by one, and the latter is only called when x's reference count reaches zero.
-    + del <物件>時並不會直接去call __del__()而會先去扣他所關聯的計算，而物件的new出來初始reference count值為1，隨著使用(指定變數為該物件時)會+1，而del <物件>時該數會-1，直到該物件的reference count為0時才會去call __del__()。 （下面使用sys.getrefcount(<物件>)也算使用唷）
+    + del x doesn't directly call x.\_\_del__() - the former decrements the reference count for x by one, and the latter is only called when x's reference count reaches zero.
+    + del <物件>時並不會直接去call \_\_del__()而會先去扣他所關聯的計算，而物件的new出來初始reference count值為1，隨著使用(指定變數為該物件時)會+1，而del <物件>時該數會-1，直到該物件的reference count為0時才會去call \_\_del__()。 （下面使用sys.getrefcount(<物件>)也算使用唷）
 參考文章：https://www.796t.com/content/1542840125.html
 
 ```python
@@ -146,5 +146,5 @@ time.sleep(2)
 # 刪除了
 ```
 
-+ 而當今天讓多個物件去使用這個class則會顯示如上圖，而在整個程式結束後才會觸發__del__()。
++ 而當今天讓多個物件去使用這個class則會顯示如上圖，而在整個程式結束後才會觸發 \_\_del__()。
 目前還不清楚什麼情況下會有機會去使用。（待學習….）
