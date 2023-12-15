@@ -1,7 +1,11 @@
 ---
 title: 【學習筆記】Python Magic Method 01：__new__、__init__、__del__。
 date: 2023-05-15 20:00:00
-tags: 學習
+tags: 
+  - python
+  - magic method
+categories:
+  - 學習
 ---
 
 ---
