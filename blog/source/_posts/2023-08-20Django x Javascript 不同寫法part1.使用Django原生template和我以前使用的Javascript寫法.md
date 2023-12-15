@@ -1,6 +1,6 @@
 ---
 title:  Django x Javascript 不同寫法part1.使用Django原生template
-date: 2023-07-23 20:00:00
+date: 2023-08-20 20:00:00
 tags: 
   - 學習
   - django

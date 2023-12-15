@@ -1,6 +1,6 @@
 ---
 title: Django x Javascript 不同寫法part2. 更新State的方式進行JS渲染
-date: 2023-07-23 20:00:00
+date: 2023-08-27 20:00:00
 tags: 
   - 學習
   - django
