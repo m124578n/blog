@@ -17,7 +17,7 @@ categories:
 
 ## 首先先研究了Line-Bot要怎麼接收訊息於是google
 
-## [LINE BOT 教學 ( Python ) | STEAM 教育學習網](https://steam.oxxostudio.tw/category/python/example/line-bot.html?source=post_page-----c0acfed7d9f6--------------------------------)
+## [LINE BOT 教學 ( Python )](https://steam.oxxostudio.tw/category/python/example/line-bot.html?source=post_page-----c0acfed7d9f6--------------------------------)
 
 這篇大致上有完整的基礎教學，開始抄功課吧！！
 
@@ -67,8 +67,8 @@ def hello(name=None):
 
 ## [LINE Developers](https://developers.line.biz/zh-hant/?source=post_page-----c0acfed7d9f6--------------------------------)
 
-### 然後去點先new channel
-### 再點選Messaging API
+然後去點先new channel
+再點選Messaging API
 
 ![](images/2023-07-23Line-Bot串接Line-Notify實現跨群組轉播訊息～/1_nilYbCP_aFa5cnxSXFXk0g.webp)
 
