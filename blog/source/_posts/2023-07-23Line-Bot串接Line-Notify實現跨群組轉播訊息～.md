@@ -7,6 +7,7 @@ tags:
   - Line Notify
   - flask
   - fly.io
+  - python
 categories:
   - 學習
 ---
