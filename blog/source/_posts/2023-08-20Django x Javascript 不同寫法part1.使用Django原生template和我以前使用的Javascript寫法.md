@@ -1,5 +1,5 @@
 ---
-title: Django x Javascript 不同寫法part1.使用Django原生template和我以前使用的Javascript寫法
+title:  Django x Javascript 不同寫法part1.使用Django原生template
 date: 2023-07-23 20:00:00
 tags: 
   - 學習
@@ -9,7 +9,7 @@ categories:
   - 學習
 ---
 
-![](images/2023-08-20Django x Javascript不同寫法part1.使用Django原生template和我以前使用的Javascript寫法/0_MmikwY_ANgH8Xj99.webp)
+![](images/2023-08-20Django x Javascript 不同寫法part1.使用Django原生template和我以前使用的Javascript寫法/0_MmikwY_ANgH8Xj99.webp)
 *image [source](https://unsplash.com/photos/black-flat-screen-computer-monitor-SyvsTmuuZyM)*
 
 
@@ -284,7 +284,7 @@ function get_all_list(){
     })
 }
 ```
-fetch把過去後回來的response要先過一層json才能使用，而這個就是把原先{% for %}迴圈拆成js的forEach去寫把每個todo串出來
+fetch把過去後回來的response要先過一層json才能使用，而這個就是把原先\{% for %\}迴圈拆成js的forEach去寫把每個todo串出來
 
 然後是新增
 
