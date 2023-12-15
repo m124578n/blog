@@ -9,7 +9,7 @@ categories:
   - 學習
 ---
 
-![](images/Git_CICD_with_Docker/1_bZP17SmwRZihfAYDr5KBFg.webp)
+![](images/2023-03-18Git_CICD_with_Docker/1_bZP17SmwRZihfAYDr5KBFg.webp)
 *image [docker-logo](https://1000logos.net/docker-logo/)*
 
 # 前言：
@@ -142,16 +142,16 @@ docker-compose up --build -d
 
 ### 我們到Github的頁面點選Actions
 
-![](images/Git_CICD_with_Docker/1_NEBsJwswssn2VffDuNyVSg.webp)
+![](images/2023-03-18Git_CICD_with_Docker/1_NEBsJwswssn2VffDuNyVSg.webp)
 
 ### 點選下方的Configure就會先幫你建立一個預設的yml
 
-![](images/Git_CICD_with_Docker/1_eT-ez4_d77qUFV54NycBig.webp)
+![](images/2023-03-18Git_CICD_with_Docker/1_eT-ez4_d77qUFV54NycBig.webp)
 
 
 這邊就可以開始編輯自己的yml檔，但是Github上也有很多已經編輯好的yml檔會出現在Configure下方可以選用。
 
-![](images/Git_CICD_with_Docker/1_Zk9WR4svGoxlIuGd59R8gw.webp)
+![](images/2023-03-18Git_CICD_with_Docker/1_Zk9WR4svGoxlIuGd59R8gw.webp)
 
 
 那這邊我就先用預設的yml來編輯
@@ -249,19 +249,19 @@ jobs:
 
 ### Settings
 
-![](images/Git_CICD_with_Docker/1_8Wz_y3La0uRxRcdfkytSvA.webp)
+![](images/2023-03-18Git_CICD_with_Docker/1_8Wz_y3La0uRxRcdfkytSvA.webp)
 
 
 ### Secrets and variables
 
 裡面的Security點開Secrets and variables中的Actions
 
-![](images/Git_CICD_with_Docker/1_PC6h-Bnv3I5Ow5j0U4NbRQ.webp)
+![](images/2023-03-18Git_CICD_with_Docker/1_PC6h-Bnv3I5Ow5j0U4NbRQ.webp)
 
 
 你會看到
 
-![](images/Git_CICD_with_Docker/1_y0993aLDo40RPOChDZMQkw.webp)
+![](images/2023-03-18Git_CICD_with_Docker/1_y0993aLDo40RPOChDZMQkw.webp)
 
 
 這邊就可以管理你在Github actions中的任何密鑰以及變數。
