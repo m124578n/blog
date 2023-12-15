@@ -1,0 +1,298 @@
+<!DOCTYPE html><html class="appearance-auto" lang="ch"><head><meta charset="UTF-8"><title>Django x Javascript 不同寫法part2. 更新State的方式進行JS渲染</title><meta name="description" content="自我實現 自我成長！"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="/blog/style/common/bulma.css"><link rel="stylesheet" href="/blog/style/base.css"><link rel="stylesheet" href="/blog/style/common/helper.css"><script src="/blog/js/common.js"></script><link rel="stylesheet" href="/blog/style/post.css"><link rel="stylesheet" href="/blog/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/blog/style/common/jquery.fancybox.min.css"><script src="/blog/js/highlight.pack.js"></script><meta name="description" content="![](images&amp;#x2F;2023-08-27Django x Javascript 不同寫法part2.更新State的方式進行JS渲染&amp;#x2F;0_Yd6S5EqUbIdDYODn.webp)image source
+上次的文章中是我以前常用的寫法，而今天要說的是我前陣子看到這篇文章發現的新大陸
+[week 21] 前端框架 - 先別急著學 React - HackMD我覺得挺有趣的就試著把上次那版改成這種方式下去實作！
+Django的程式碼跟上週一樣所以今天不會有python的code，就請參考上篇文章！！
+那這次我是使用axios跟fetch大同小異，只是需要而外安裝（引入）也有使用到一些JQuery，話不多說先上code吧～
+&amp;lt;script src=&amp;quot;https://cod.."><meta name="generator" content="Hexo 7.0.0"><link rel="alternate" href="/blog/atom.xml" title="Shun Chih's blog" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/blog/">Shun Chih's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Django x Javascript 不同寫法part2. 更新State的方式進行JS渲染</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">返回頂部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/blog/">首頁</a></h3><h3 class="is-inline-block"><a href="/blog/about">關於我</a></h3><h3 class="is-inline-block"><a href="/blog/archives">文章列表</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/blog/">首頁</a></h3><h3 class="is-inline-block"><a href="/blog/about">關於我</a></h3><h3 class="is-inline-block"><a href="/blog/archives">文章列表</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#week-21-%E5%89%8D%E7%AB%AF%E6%A1%86%E6%9E%B6-%E5%85%88%E5%88%A5%E6%80%A5%E8%91%97%E5%AD%B8-React-HackMD"><span class="toc-text">[week 21] 前端框架 - 先別急著學 React - HackMD</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/blog/tags/django"><i class="tag post-item-tag">django</i></a><a href="/blog/tags/%E5%AD%B8%E7%BF%92"><i class="tag post-item-tag">學習</i></a><a href="/blog/tags/javascript"><i class="tag post-item-tag">javascript</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Django x Javascript 不同寫法part2. 更新State的方式進行JS渲染</h1><time class="has-text-grey" datetime="2023-07-23T12:00:00.000Z">2023-07-23</time><article class="mt-2 post-content"><p>![](images&#x2F;2023-08-27Django x Javascript 不同寫法part2.更新State的方式進行JS渲染&#x2F;0_Yd6S5EqUbIdDYODn.webp)<br><em>image <a target="_blank" rel="noopener" href="https://unsplash.com/photos/a-macbook-with-lines-of-code-on-its-screen-on-a-busy-desk-m_HRfLhgABo">source</a></em></p>
+<p>上次的文章中是我以前常用的寫法，而今天要說的是我前陣子看到這篇文章發現的新大陸</p>
+<h3 id="week-21-前端框架-先別急著學-React-HackMD"><a href="#week-21-前端框架-先別急著學-React-HackMD" class="headerlink" title="[week 21] 前端框架 - 先別急著學 React - HackMD"></a><a target="_blank" rel="noopener" href="https://hackmd.io/@Heidi-Liu/note-fe302-review?source=post_page-----4e0621202043--------------------------------">[week 21] 前端框架 - 先別急著學 React - HackMD</a></h3><p>我覺得挺有趣的就試著把上次那版改成這種方式下去實作！</p>
+<p>Django的程式碼跟上週一樣所以今天不會有python的code，就請參考上篇文章！！</p>
+<p>那這次我是使用axios跟fetch大同小異，只是需要而外安裝（引入）也有使用到一些JQuery，話不多說先上code吧～</p>
+<pre><code class="hljs javascript">&lt;script src=<span class="hljs-string">&quot;https://code.jquery.com/jquery-3.7.0.js&quot;</span> integrity=<span class="hljs-string">&quot;sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=&quot;</span> crossorigin=<span class="hljs-string">&quot;anonymous&quot;</span>&gt;&lt;/script&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></span>
+<span class="hljs-comment">//....</span>
+
+<span class="hljs-keyword">let</span> state = &#123;
+    <span class="hljs-attr">todos</span>: []
+&#125;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">get_all_list</span>(<span class="hljs-params"></span>)&#123;
+    axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/api/&quot;</span>)
+        .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> &#123;
+            response.<span class="hljs-property">data</span>.<span class="hljs-property">data</span>.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> &#123;
+                state = &#123;
+                    <span class="hljs-attr">todos</span>: [...state.<span class="hljs-property">todos</span>, &#123;
+                        <span class="hljs-attr">id</span>: todo.<span class="hljs-property">id</span>,
+                        <span class="hljs-attr">content</span>: todo.<span class="hljs-property">title</span>,
+                        <span class="hljs-attr">isDone</span>: todo.<span class="hljs-property">complete</span>
+                    &#125;]
+                &#125;
+            &#125;)
+            <span class="hljs-title function_">updateState</span>(state)
+        &#125;)
+    &#125;
+
+<span class="hljs-comment">// 更新 state</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">updateState</span>(<span class="hljs-params">newState</span>) &#123;
+    state = newState;
+    <span class="hljs-title function_">render</span>()
+&#125;
+
+<span class="hljs-comment">// state =&gt; UI</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">render</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-comment">// 先把畫面清空</span>
+    $(<span class="hljs-string">&#x27;.todos&#x27;</span>).<span class="hljs-title function_">empty</span>();
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(state.<span class="hljs-property">todos</span>)
+    $(<span class="hljs-string">&#x27;.todos&#x27;</span>).<span class="hljs-title function_">append</span>(
+    <span class="hljs-comment">// 把每個 todo 的 HTML 集合起來放到畫面上</span>
+    state.<span class="hljs-property">todos</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> <span class="hljs-title class_">Todo</span>(todo)).<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27;&#x27;</span>)
+    );
+&#125;
+
+<span class="hljs-comment">// Todo component</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Todo</span>(<span class="hljs-params">&#123;id, content, isDone&#125;</span>) &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`</span>
+<span class="hljs-string">    &lt;div class=&quot;ui segment todo&quot; data-id=&quot;<span class="hljs-subst">$&#123;id&#125;</span>&quot;&gt;</span>
+<span class="hljs-string">        &lt;p class=&quot;ui big header&quot;&gt; <span class="hljs-subst">$&#123;id&#125;</span> | <span class="hljs-subst">$&#123;content&#125;</span> &lt;/p&gt;</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">        <span class="hljs-subst">$&#123;Span(&#123;</span></span>
+<span class="hljs-subst"><span class="hljs-string">            className: isDone ? <span class="hljs-string">&#x27;ui green label&#x27;</span> : <span class="hljs-string">&#x27;ui gray label&#x27;</span>,</span></span>
+<span class="hljs-subst"><span class="hljs-string">            content: isDone ? <span class="hljs-string">&#x27;Complete&#x27;</span> : <span class="hljs-string">&#x27;Not Completed&#x27;</span></span></span>
+<span class="hljs-subst"><span class="hljs-string">        &#125;)&#125;</span></span>
+<span class="hljs-string"></span>
+<span class="hljs-string">        <span class="hljs-subst">$&#123;Button(&#123;</span></span>
+<span class="hljs-subst"><span class="hljs-string">            className: <span class="hljs-string">&#x27;blue btn-update&#x27;</span>,</span></span>
+<span class="hljs-subst"><span class="hljs-string">            content: <span class="hljs-string">&#x27;Update&#x27;</span></span></span>
+<span class="hljs-subst"><span class="hljs-string">        &#125;)&#125;</span></span>
+<span class="hljs-string"></span>
+<span class="hljs-string">        <span class="hljs-subst">$&#123;Button(&#123;</span></span>
+<span class="hljs-subst"><span class="hljs-string">            className: <span class="hljs-string">&#x27;red btn-delete&#x27;</span>,</span></span>
+<span class="hljs-subst"><span class="hljs-string">            content: <span class="hljs-string">&#x27;Delete&#x27;</span></span></span>
+<span class="hljs-subst"><span class="hljs-string">        &#125;)&#125;</span></span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    &lt;/div&gt;</span>
+<span class="hljs-string">    `</span>
+&#125;
+
+<span class="hljs-comment">// Span component</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Span</span>(<span class="hljs-params">props</span>)&#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;span class=&quot;<span class="hljs-subst">$&#123;props.className&#125;</span>&quot;&gt;<span class="hljs-subst">$&#123;props.content&#125;</span>&lt;/span&gt;`</span>
+&#125;
+
+<span class="hljs-comment">// Button component</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Button</span>(<span class="hljs-params">props</span>) &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`</span>
+<span class="hljs-string">    &lt;a class=&quot;ui <span class="hljs-subst">$&#123;props.className&#125;</span> button&quot;&gt;<span class="hljs-subst">$&#123;props.content&#125;</span>&lt;/a&gt;</span>
+<span class="hljs-string">    `</span>
+&#125;
+
+<span class="hljs-comment">// 新增 todo</span>
+$(<span class="hljs-string">&#x27;.btn-add&#x27;</span>).<span class="hljs-title function_">click</span>(<span class="hljs-function">() =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> content = $(<span class="hljs-string">&#x27;.input-todo&#x27;</span>).<span class="hljs-title function_">val</span>();
+    <span class="hljs-keyword">if</span> (!content) <span class="hljs-keyword">return</span>;
+    $(<span class="hljs-string">&#x27;.input-todo&#x27;</span>).<span class="hljs-title function_">val</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+    axios.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/api/add/&quot;</span>, 
+        &#123;
+            <span class="hljs-string">&quot;title&quot;</span>: content
+        &#125;,
+        &#123;
+            <span class="hljs-attr">headers</span>: &#123; 
+            <span class="hljs-string">&quot;X-CSRFToken&quot;</span>: <span class="hljs-string">&quot;&#123;&#123;csrf_token&#125;&#125;&quot;</span>,
+            &#125;,
+        &#125;
+    )
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> &#123;
+        todo_id = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;todo_id&quot;</span>]
+        title = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;todo_title&quot;</span>]
+        complete = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;complete&quot;</span>]
+        <span class="hljs-comment">// 更新 state</span>
+        <span class="hljs-title function_">updateState</span>(&#123;
+            <span class="hljs-attr">todos</span>: [...state.<span class="hljs-property">todos</span>, &#123;
+                <span class="hljs-attr">id</span>: todo_id,
+                <span class="hljs-attr">content</span>: title,
+                <span class="hljs-attr">isDone</span>: complete
+            &#125;]
+        &#125;)
+    &#125;)
+&#125;)
+
+<span class="hljs-comment">// 刪除 todo</span>
+$(<span class="hljs-string">&#x27;.todos&#x27;</span>).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-string">&#x27;.btn-delete&#x27;</span>, <span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> id = <span class="hljs-title class_">Number</span>($(e.<span class="hljs-property">target</span>).<span class="hljs-title function_">parents</span>(<span class="hljs-string">&#x27;.todo&#x27;</span>).<span class="hljs-title function_">attr</span>(<span class="hljs-string">&#x27;data-id&#x27;</span>));
+    axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/api/delete/&quot;</span>+id)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> &#123;
+        d_id = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;todo_id&quot;</span>]
+        <span class="hljs-title function_">updateState</span>(&#123;
+            <span class="hljs-attr">todos</span>: state.<span class="hljs-property">todos</span> = state.<span class="hljs-property">todos</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.<span class="hljs-property">id</span> !== d_id)
+        &#125;)
+    &#125;)
+&#125;)
+
+<span class="hljs-comment">// 未完成 &lt;-&gt; 已完成</span>
+$(<span class="hljs-string">&#x27;.todos&#x27;</span>).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-string">&#x27;.btn-update&#x27;</span>, <span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> id = <span class="hljs-title class_">Number</span>($(e.<span class="hljs-property">target</span>).<span class="hljs-title function_">parents</span>(<span class="hljs-string">&#x27;.todo&#x27;</span>).<span class="hljs-title function_">attr</span>(<span class="hljs-string">&#x27;data-id&#x27;</span>));
+    axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/api/update/&quot;</span>+id)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> &#123;
+        u_id = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;todo_id&quot;</span>]
+        complete = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;complete&quot;</span>]
+        <span class="hljs-title function_">updateState</span>(&#123;
+            <span class="hljs-attr">todos</span>: state.<span class="hljs-property">todos</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> &#123;
+                <span class="hljs-keyword">if</span> (todo.<span class="hljs-property">id</span> !== u_id) <span class="hljs-keyword">return</span> todo;
+                <span class="hljs-keyword">return</span> &#123;
+                ...todo,
+                <span class="hljs-attr">isDone</span>: complete
+                &#125;
+            &#125;)
+        &#125;)
+    &#125;)
+&#125;)</code></pre>
+
+<p>跟上次相比是不是很不一樣，我自己覺得這樣子的寫法更加的直觀和易讀易懂！</p>
+<p>那我們一樣拆開來看，首先我們要生成Todo的component</p>
+<pre><code class="hljs javascript"><span class="hljs-comment">// Todo component</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Todo</span>(<span class="hljs-params">&#123;id, content, isDone&#125;</span>) &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`</span>
+<span class="hljs-string">    &lt;div class=&quot;ui segment todo&quot; data-id=&quot;<span class="hljs-subst">$&#123;id&#125;</span>&quot;&gt;</span>
+<span class="hljs-string">        &lt;p class=&quot;ui big header&quot;&gt; <span class="hljs-subst">$&#123;id&#125;</span> | <span class="hljs-subst">$&#123;content&#125;</span> &lt;/p&gt;</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">        <span class="hljs-subst">$&#123;Span(&#123;</span></span>
+<span class="hljs-subst"><span class="hljs-string">            className: isDone ? <span class="hljs-string">&#x27;ui green label&#x27;</span> : <span class="hljs-string">&#x27;ui gray label&#x27;</span>,</span></span>
+<span class="hljs-subst"><span class="hljs-string">            content: isDone ? <span class="hljs-string">&#x27;Complete&#x27;</span> : <span class="hljs-string">&#x27;Not Completed&#x27;</span></span></span>
+<span class="hljs-subst"><span class="hljs-string">        &#125;)&#125;</span></span>
+<span class="hljs-string"></span>
+<span class="hljs-string">        <span class="hljs-subst">$&#123;Button(&#123;</span></span>
+<span class="hljs-subst"><span class="hljs-string">            className: <span class="hljs-string">&#x27;blue btn-update&#x27;</span>,</span></span>
+<span class="hljs-subst"><span class="hljs-string">            content: <span class="hljs-string">&#x27;Update&#x27;</span></span></span>
+<span class="hljs-subst"><span class="hljs-string">        &#125;)&#125;</span></span>
+<span class="hljs-string"></span>
+<span class="hljs-string">        <span class="hljs-subst">$&#123;Button(&#123;</span></span>
+<span class="hljs-subst"><span class="hljs-string">            className: <span class="hljs-string">&#x27;red btn-delete&#x27;</span>,</span></span>
+<span class="hljs-subst"><span class="hljs-string">            content: <span class="hljs-string">&#x27;Delete&#x27;</span></span></span>
+<span class="hljs-subst"><span class="hljs-string">        &#125;)&#125;</span></span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    &lt;/div&gt;</span>
+<span class="hljs-string">    `</span>
+&#125;
+
+<span class="hljs-comment">// Span component</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Span</span>(<span class="hljs-params">props</span>)&#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;span class=&quot;<span class="hljs-subst">$&#123;props.className&#125;</span>&quot;&gt;<span class="hljs-subst">$&#123;props.content&#125;</span>&lt;/span&gt;`</span>
+&#125;
+
+<span class="hljs-comment">// Button component</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Button</span>(<span class="hljs-params">props</span>) &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`</span>
+<span class="hljs-string">    &lt;a class=&quot;ui <span class="hljs-subst">$&#123;props.className&#125;</span> button&quot;&gt;<span class="hljs-subst">$&#123;props.content&#125;</span>&lt;/a&gt;</span>
+<span class="hljs-string">    `</span>
+&#125;</code></pre>
+
+<p>我的Todo component裡面還包括了一個Span component和兩個Button component那他們會依據帶進去的參數而有不同的樣式</p>
+<p>接著再到get_all_list()</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">let</span> state = &#123;
+    <span class="hljs-attr">todos</span>: []
+&#125;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">get_all_list</span>(<span class="hljs-params"></span>)&#123;
+    axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/api/&quot;</span>)
+        .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> &#123;
+            response.<span class="hljs-property">data</span>.<span class="hljs-property">data</span>.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> &#123;
+                state = &#123;
+                    <span class="hljs-attr">todos</span>: [...state.<span class="hljs-property">todos</span>, &#123;
+                        <span class="hljs-attr">id</span>: todo.<span class="hljs-property">id</span>,
+                        <span class="hljs-attr">content</span>: todo.<span class="hljs-property">title</span>,
+                        <span class="hljs-attr">isDone</span>: todo.<span class="hljs-property">complete</span>
+                    &#125;]
+                &#125;
+            &#125;)
+            <span class="hljs-title function_">updateState</span>(state)
+        &#125;)
+    &#125;
+
+<span class="hljs-comment">// 更新 state</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">updateState</span>(<span class="hljs-params">newState</span>) &#123;
+    state = newState;
+    <span class="hljs-title function_">render</span>()
+&#125;
+
+<span class="hljs-comment">// state =&gt; UI</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">render</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-comment">// 先把畫面清空</span>
+    $(<span class="hljs-string">&#x27;.todos&#x27;</span>).<span class="hljs-title function_">empty</span>();
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(state.<span class="hljs-property">todos</span>)
+    $(<span class="hljs-string">&#x27;.todos&#x27;</span>).<span class="hljs-title function_">append</span>(
+    <span class="hljs-comment">// 把每個 todo 的 HTML 集合起來放到畫面上</span>
+    state.<span class="hljs-property">todos</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> <span class="hljs-title class_">Todo</span>(todo)).<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27;&#x27;</span>)
+    )
+&#125;</code></pre>
+
+<p>一開始的狀態先給一個空array，在get_all_list()用axios去打api拿取現在所有的Todo datas，拿到datas後在一個一個把他們塞進去todos array裡面，最後再交由updateState去把現在的state更新掉然後render，render()的工作很簡單會先把現在html上所有的todos元素清空，然後在一筆一筆塞進去～</p>
+<p>再來我們來看看新增</p>
+<pre><code class="hljs javascript"><span class="hljs-comment">// 新增 todo</span>
+$(<span class="hljs-string">&#x27;.btn-add&#x27;</span>).<span class="hljs-title function_">click</span>(<span class="hljs-function">() =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> content = $(<span class="hljs-string">&#x27;.input-todo&#x27;</span>).<span class="hljs-title function_">val</span>();
+    <span class="hljs-keyword">if</span> (!content) <span class="hljs-keyword">return</span>;
+    $(<span class="hljs-string">&#x27;.input-todo&#x27;</span>).<span class="hljs-title function_">val</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+    axios.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/api/add/&quot;</span>, 
+        &#123;
+            <span class="hljs-string">&quot;title&quot;</span>: content
+        &#125;,
+        &#123;
+            <span class="hljs-attr">headers</span>: &#123; 
+              <span class="hljs-string">&quot;X-CSRFToken&quot;</span>: <span class="hljs-string">&quot;&#123;&#123;csrf_token&#125;&#125;&quot;</span>,
+            &#125;,
+        &#125;
+    )
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> &#123;
+        todo_id = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;todo_id&quot;</span>]
+        title = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;todo_title&quot;</span>]
+        complete = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;complete&quot;</span>]
+        <span class="hljs-comment">// 更新 state</span>
+        <span class="hljs-title function_">updateState</span>(&#123;
+            <span class="hljs-attr">todos</span>: [...state.<span class="hljs-property">todos</span>, &#123;
+                <span class="hljs-attr">id</span>: todo_id,
+                <span class="hljs-attr">content</span>: title,
+                <span class="hljs-attr">isDone</span>: complete
+            &#125;]
+        &#125;)
+    &#125;)
+&#125;)</code></pre>
+
+<p>很簡單的去判斷button有沒有沒click，然後取input的值丟axios，那response會回傳該todo的data，就把他updateState一次就OK了！</p>
+<p>接下來的修改和刪除也是同樣的概念，打api後response丟給updateState就完事啦～</p>
+<pre><code class="hljs javascript"><span class="hljs-comment">// 刪除 todo</span>
+$(<span class="hljs-string">&#x27;.todos&#x27;</span>).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-string">&#x27;.btn-delete&#x27;</span>, <span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> id = <span class="hljs-title class_">Number</span>($(e.<span class="hljs-property">target</span>).<span class="hljs-title function_">parents</span>(<span class="hljs-string">&#x27;.todo&#x27;</span>).<span class="hljs-title function_">attr</span>(<span class="hljs-string">&#x27;data-id&#x27;</span>));
+    axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/api/delete/&quot;</span>+id)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> &#123;
+        d_id = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;todo_id&quot;</span>]
+        <span class="hljs-title function_">updateState</span>(&#123;
+            <span class="hljs-attr">todos</span>: state.<span class="hljs-property">todos</span> = state.<span class="hljs-property">todos</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.<span class="hljs-property">id</span> !== d_id)
+        &#125;)
+    &#125;)
+&#125;)
+
+<span class="hljs-comment">// 未完成 &lt;-&gt; 已完成</span>
+$(<span class="hljs-string">&#x27;.todos&#x27;</span>).<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-string">&#x27;.btn-update&#x27;</span>, <span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> id = <span class="hljs-title class_">Number</span>($(e.<span class="hljs-property">target</span>).<span class="hljs-title function_">parents</span>(<span class="hljs-string">&#x27;.todo&#x27;</span>).<span class="hljs-title function_">attr</span>(<span class="hljs-string">&#x27;data-id&#x27;</span>));
+    axios.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/api/update/&quot;</span>+id)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> &#123;
+        u_id = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;todo_id&quot;</span>]
+        complete = response.<span class="hljs-property">data</span>[<span class="hljs-string">&quot;complete&quot;</span>]
+        <span class="hljs-title function_">updateState</span>(&#123;
+            <span class="hljs-attr">todos</span>: state.<span class="hljs-property">todos</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> &#123;
+                <span class="hljs-keyword">if</span> (todo.<span class="hljs-property">id</span> !== u_id) <span class="hljs-keyword">return</span> todo;
+                <span class="hljs-keyword">return</span> &#123;
+                ...todo,
+                <span class="hljs-attr">isDone</span>: complete
+                &#125;
+            &#125;)
+        &#125;)
+    &#125;)
+&#125;)</code></pre>
+
+<p>刪除就是把存在state裡的todo id移除掉，而修改則是把該todo id抓出來改變他的isDone屬性。</p>
+<p>至此就大功告成啦，對Javascript不熟悉的我經過這個練習大概可以知道state component的概念！下次可能就是直接用react改寫看看囉！</p>
+<p>軟體和程式的世界真的很有趣，可以用不同的做法達到相同的目的，而且瞬息萬變，可能明天又能有新的東西可以學習，想想就興奮呢！！</p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/blog/2023/07/23/2023-08-20Django%20x%20Javascript%20%E4%B8%8D%E5%90%8C%E5%AF%AB%E6%B3%95part1.%E4%BD%BF%E7%94%A8Django%E5%8E%9F%E7%94%9Ftemplate%E5%92%8C%E6%88%91%E4%BB%A5%E5%89%8D%E4%BD%BF%E7%94%A8%E7%9A%84Javascript%E5%AF%AB%E6%B3%95/" title="Django x Javascript 不同寫法part1.使用Django原生template"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一頁: Django x Javascript 不同寫法part1.使用Django原生template</span></a><a class="button is-default" href="/blog/2023/07/09/2023-07-09%E3%80%90%E9%96%B1%E8%AE%80%E5%BF%83%E5%BE%97%E3%80%91%E5%8E%9F%E5%AD%90%E7%BF%92%E6%85%A3/" title="【閱讀心得】原子習慣"><span class="has-text-weight-semibold">下一頁: 【閱讀心得】原子習慣</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="m124578n/blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/m124578n"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com/m23568n"><i class="iconfont icon-ins"></i></a><!-- RSS--><a title="rss" target="_blank" rel="noopener nofollow" href="/blog/atom.xml"><i class="iconfont icon-rss"></i></a><!-- 知乎--><!-- 领英--><a title="linkedin" target="_blank" rel="noopener nofollow" href="//www.linkedin.com/in/john19980215"><i class="iconfont icon-linkedin"></i></a><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/m23568n"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Shun Chih 2023</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/blog/js/jquery-3.6.1.min.js"></script><script src="/blog/js/jquery-fancybox.min.js"></script><script src="/blog/js/img_zoom.js"></script><script src="/blog/js/post.js"></script></body></html>
