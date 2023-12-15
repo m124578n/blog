@@ -1,0 +1,65 @@
+<!DOCTYPE html><html class="appearance-auto" lang="ch"><head><meta charset="UTF-8"><title>想法不斷，選擇困難</title><meta name="description" content="自我實現 自我成長！"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="/blog/style/common/bulma.css"><link rel="stylesheet" href="/blog/style/base.css"><link rel="stylesheet" href="/blog/style/common/helper.css"><script src="/blog/js/common.js"></script><link rel="stylesheet" href="/blog/style/post.css"><link rel="stylesheet" href="/blog/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/blog/style/common/jquery.fancybox.min.css"><script src="/blog/js/highlight.pack.js"></script><meta name="description" content="image source
+本日開發延續之前的想法，發現越想越多，越想越難下手～這可能也是選擇障礙的一種！
+
+今天我試著把許多地方改變了許多，來看看before after吧。
+原本的做法
+目前會員登入的流程都是在view裡面，包括檢查是否已經是會員，檢查密碼是不是正確的，再送Json給前端看這個人到底有沒有登入成功。寫起來大概會長這樣。def 會員登入頁面(request):
+  if request.method == &amp;quot;GET&amp;quot;:
+    ctx = &amp;#123;&amp;#125;
+    return render(request, &amp;quot;會員登入.html&amp;quot;, ctx)
+  if request.method == &amp;quot;POST&amp;quot;:
+    data .."><meta name="generator" content="Hexo 7.0.0"><link rel="alternate" href="/blog/atom.xml" title="Shun Chih's blog" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/blog/">Shun Chih's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">想法不斷，選擇困難</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">返回頂部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/blog/">首頁</a></h3><h3 class="is-inline-block"><a href="/blog/about">關於我</a></h3><h3 class="is-inline-block"><a href="/blog/archives">文章列表</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/blog/">首頁</a></h3><h3 class="is-inline-block"><a href="/blog/about">關於我</a></h3><h3 class="is-inline-block"><a href="/blog/archives">文章列表</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E6%9C%AC%E7%9A%84%E5%81%9A%E6%B3%95"><span class="toc-text">原本的做法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B9%E7%89%88%E5%BE%8C%E7%9A%84%E5%81%9A%E6%B3%95"><span class="toc-text">改版後的做法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A5%E4%B8%8A%E5%85%A9%E5%80%8B%E5%81%9A%E6%B3%95%E9%83%BD%E6%98%AF%E5%BE%88%E5%A5%BD%E7%9A%84%E9%96%8B%E7%99%BC%E6%96%B9%E5%BC%8F%EF%BC%8C%E5%8F%AF%E4%BB%A5%E6%A0%B9%E6%93%9A%E4%BD%A0%E7%9A%84%E6%83%85%E5%A2%83%E6%88%96%E9%9C%80%E6%B1%82%E5%81%9A%E9%81%B8%E6%93%87%E3%80%82"><span class="toc-text">以上兩個做法都是很好的開發方式，可以根據你的情境或需求做選擇。</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/blog/tags/django"><i class="tag post-item-tag">django</i></a><a href="/blog/tags/python"><i class="tag post-item-tag">python</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">想法不斷，選擇困難</h1><time class="has-text-grey" datetime="2023-04-13T12:00:00.000Z">2023-04-13</time><article class="mt-2 post-content"><p><img src="/blog/images/%E6%83%B3%E6%B3%95%E4%B8%8D%E6%96%B7_%E9%81%B8%E6%93%87%E5%9B%B0%E9%9B%A3/0__xXSZf9Ve9CJFFkm.webp"><br><em>image <a target="_blank" rel="noopener" href="https://www.ttnmedia.com/%E6%8C%89%E4%B8%8B%E6%9A%AB%E5%81%9C%E9%88%95-%E9%96%8B%E5%A7%8B%E6%80%9D%E8%80%83/">source</a></em></p>
+<p>本日開發延續之前的想法，發現越想越多，越想越難下手～這可能也是選擇障礙的一種！</p>
+<hr>
+<p>今天我試著把許多地方改變了許多，來看看before after吧。</p>
+<h2 id="原本的做法"><a href="#原本的做法" class="headerlink" title="原本的做法"></a>原本的做法</h2><ul>
+<li>目前會員登入的流程都是在view裡面，包括檢查是否已經是會員，檢查密碼是不是正確的，再送Json給前端看這個人到底有沒有登入成功。寫起來大概會長這樣。<pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">會員登入頁面</span>(<span class="hljs-params">request</span>):
+  <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;GET&quot;</span>:
+    ctx = &#123;&#125;
+    <span class="hljs-keyword">return</span> render(request, <span class="hljs-string">&quot;會員登入.html&quot;</span>, ctx)
+  <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;POST&quot;</span>:
+    data = &#123;&#125;
+    會員帳號 = request.POST.get(<span class="hljs-string">&quot;會員帳號&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+    會員密碼 = request.POST.get(<span class="hljs-string">&quot;會員密碼&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+    會員_query_set = 會員資料表.objects.<span class="hljs-built_in">filter</span>(會員帳號欄位=會員帳號)
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">list</span>(會員_query_set) == []:
+      data[<span class="hljs-string">&#x27;message&#x27;</span>] = <span class="hljs-string">&quot;噗噗！！你還沒有註冊！&quot;</span>
+      <span class="hljs-keyword">return</span> JsonResponse(data)
+    <span class="hljs-keyword">if</span> check_password(會員_query_set.會員密碼, 會員密碼):
+      data[<span class="hljs-string">&#x27;message&#x27;</span>] = <span class="hljs-string">&quot;密碼正確通過&quot;</span>
+      <span class="hljs-keyword">return</span> JsonResponse(data)
+    <span class="hljs-keyword">else</span>:
+      data[<span class="hljs-string">&#x27;message&#x27;</span>] = <span class="hljs-string">&quot;噗噗！！密碼錯誤&quot;</span>
+      <span class="hljs-keyword">return</span> JsonResponse(data)</code></pre>
+現在看可能有些人已經受不了了，什麼哩哩叩叩的東西都摻雜在一起！？</li>
+</ul>
+<h2 id="改版後的做法"><a href="#改版後的做法" class="headerlink" title="改版後的做法"></a>改版後的做法</h2><ul>
+<li>改版後大概會像是把所有東西都打包起來，把view清乾淨。</li>
+</ul>
+<pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">會員登入頁面</span>(<span class="hljs-params">request</span>):
+  <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;GET&quot;</span>:
+    ctx = &#123;&#125;
+    <span class="hljs-keyword">return</span> render(request, <span class="hljs-string">&quot;會員登入.html&quot;</span>, ctx)
+  <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">&quot;POST&quot;</span>:
+    data = &#123;&#125;
+    會員帳號 = request.POST.get(<span class="hljs-string">&quot;會員帳號&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+    會員密碼 = request.POST.get(<span class="hljs-string">&quot;會員密碼&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+    member = 會員()
+    <span class="hljs-keyword">if</span> member.login(會員帳號, 會員密碼):
+      data[<span class="hljs-string">&#x27;message&#x27;</span>] = <span class="hljs-string">&quot;密碼正確！！&quot;</span>
+    <span class="hljs-keyword">else</span>:
+      data[<span class="hljs-string">&#x27;message&#x27;</span>] = <span class="hljs-string">&quot;噗噗！！帳號密碼有誤～&quot;</span>
+    <span class="hljs-keyword">return</span> JsonResponse(data)</code></pre>
+
+<p>這樣子感覺起來好像好一點了，至少變的比較好讀了。</p>
+<hr>
+<p>於是呢，我就改改改，之前幾乎都沒有包成物件的地方都調整了許多，也盡量找出符合他們的method，類似：member.login(), member.register(), member.create_case()等等等…..，盡量找出是屬於這個物件的行為，也剛好之前有試著做OOA，所以大部分都只是抓漏，把以前程式碼符合行為的地方抓出來包，包著包著view就越來越輕便了，可喜可賀，可口可樂。</p>
+<p>不過，後面又有衍生的問題產生了，我每一個物件的方法隨著我抓漏的過程中越來越多，然而我目前也都沒有使用到繼承也還沒有感覺到可以使用的點，讓我有點不明白這樣的方面究竟是對的還是錯的呢？？</p>
+<p>最後希望明天的我可以幫現在的我解決這些問題！！</p>
+<hr>
+<p>其實還有一個地方也滿讓我兩難的，就是member.login()這個做法是好的嗎？還是其實會需要有一個Service物件來讓member可以登入呢？</p>
+<p>問了ChatGPT給我的回應是(由於那個對話被我刪掉了只能憑印象)：</p>
+<h2 id="以上兩個做法都是很好的開發方式，可以根據你的情境或需求做選擇。"><a href="#以上兩個做法都是很好的開發方式，可以根據你的情境或需求做選擇。" class="headerlink" title="以上兩個做法都是很好的開發方式，可以根據你的情境或需求做選擇。"></a>以上兩個做法都是很好的開發方式，可以根據你的情境或需求做選擇。</h2><p>但我還是懷疑了他，真的是這樣嗎！？</p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/blog/2023/05/15/%E5%AD%B8%E7%BF%92%E7%AD%86%E8%A8%98_python_magic_methods_part1/" title="【學習筆記】Python Magic Method 01：__new__、__init__、__del__。"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一頁: 【學習筆記】Python Magic Method 01：__new__、__init__、__del__。</span></a><a class="button is-default" href="/blog/2023/04/12/%E5%88%9D%E6%8E%A2%E5%BA%97%E5%AE%B6%E6%9C%83%E5%93%A1%E7%B6%B2%E7%AB%99%E8%A8%AD%E8%A8%88/" title="初探店家會員網站設計"><span class="has-text-weight-semibold">下一頁: 初探店家會員網站設計</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="m124578n/blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/m124578n"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com/m23568n"><i class="iconfont icon-ins"></i></a><!-- RSS--><a title="rss" target="_blank" rel="noopener nofollow" href="/blog/atom.xml"><i class="iconfont icon-rss"></i></a><!-- 知乎--><!-- 领英--><a title="linkedin" target="_blank" rel="noopener nofollow" href="//www.linkedin.com/in/john19980215"><i class="iconfont icon-linkedin"></i></a><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/m23568n"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Shun Chih 2023</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/blog/js/jquery-3.6.1.min.js"></script><script src="/blog/js/jquery-fancybox.min.js"></script><script src="/blog/js/img_zoom.js"></script><script src="/blog/js/post.js"></script></body></html>
