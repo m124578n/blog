@@ -9,7 +9,7 @@ categories:
 ---
 
 ![](images/django_flask_practice/Django-vs-Flask-1.jpg)
-*From [django-vs-flask-which-framework-to-choose](https://www.turing.com/blog/django-vs-flask-which-framework-to-choose/)*
+*image [django-vs-flask-which-framework-to-choose](https://www.turing.com/blog/django-vs-flask-which-framework-to-choose/)*
 
 最近在練習 [Django](https://www.djangoproject.com/) 和 [Flask](https://flask.palletsprojects.com/en/latest/) 的restful相關套件實作方法，來對比一下兩者使用的相關套件等。
 

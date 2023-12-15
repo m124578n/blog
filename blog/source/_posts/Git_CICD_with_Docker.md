@@ -10,7 +10,7 @@ categories:
 ---
 
 ![](images/Git_CICD_with_Docker/1_bZP17SmwRZihfAYDr5KBFg.webp)
-*From [docker-logo](https://1000logos.net/docker-logo/)*
+*image [docker-logo](https://1000logos.net/docker-logo/)*
 
 # 前言：
 
