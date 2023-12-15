@@ -54,14 +54,10 @@ appearance: auto # Default value is auto
 favicon: images/favicon.ico
 
 friend_links:
-  - title: Google
-    link: https://www.google.com/
-  - title: Github
-    link: https://www.github.com/
-  - title: V2EX
-    link: https://v2ex.com/
-  - title: Twitter
-    link: https://twitter.com/
+  - title: medium
+    link: https://medium.com/@m23568n
+  - title: ithelp
+    link: https://ithelp.ithome.com.tw/users/20162905
 
 # Google Analytics
 ga_track_id:
