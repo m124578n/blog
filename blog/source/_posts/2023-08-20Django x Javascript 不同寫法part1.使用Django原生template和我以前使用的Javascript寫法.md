@@ -9,7 +9,7 @@ categories:
   - 學習
 ---
 
-![](images/2023-08-20Django x Javascript 不同寫法part1.使用Django原生template和我以前使用的Javascript寫法/0_MmikwY_ANgH8Xj99.webp)
+![](images/2023-08-20DjangoxJavascript不同寫法part1.使用Django原生template和我以前使用的Javascript寫法/0_MmikwY_ANgH8Xj99.webp)
 *image [source](https://unsplash.com/photos/black-flat-screen-computer-monitor-SyvsTmuuZyM)*
 
 

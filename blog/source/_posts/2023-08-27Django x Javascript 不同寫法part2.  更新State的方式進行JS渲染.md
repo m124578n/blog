@@ -9,7 +9,7 @@ categories:
   - 學習
 ---
 
-![](images/2023-08-27Django x Javascript 不同寫法part2.更新State的方式進行JS渲染/0_Yd6S5EqUbIdDYODn.webp)
+![](images/2023-08-27DjangoxJavascript不同寫法part2.更新State的方式進行JS渲染/0_Yd6S5EqUbIdDYODn.webp)
 *image [source](https://unsplash.com/photos/a-macbook-with-lines-of-code-on-its-screen-on-a-busy-desk-m_HRfLhgABo)*
 
 上次的文章中是我以前常用的寫法，而今天要說的是我前陣子看到這篇文章發現的新大陸
