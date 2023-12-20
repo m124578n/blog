@@ -208,6 +208,13 @@
   </url>
   
   <url>
+    <loc>https://m124578n.github.io/tags/magic-method/</loc>
+    <lastmod>2023-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://m124578n.github.io/tags/life/</loc>
     <lastmod>2023-12-20</lastmod>
     <changefreq>weekly</changefreq>
@@ -222,7 +229,7 @@
   </url>
   
   <url>
-    <loc>https://m124578n.github.io/tags/magic-method/</loc>
+    <loc>https://m124578n.github.io/tags/%E8%87%AA%E6%88%91%E6%AA%A2%E8%A6%96/</loc>
     <lastmod>2023-12-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -230,13 +237,6 @@
   
   <url>
     <loc>https://m124578n.github.io/tags/flask/</loc>
-    <lastmod>2023-12-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://m124578n.github.io/tags/%E8%87%AA%E6%88%91%E6%AA%A2%E8%A6%96/</loc>
     <lastmod>2023-12-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
