@@ -1,0 +1,80 @@
+<!DOCTYPE html><html class="appearance-auto" lang="ch"><head><meta charset="UTF-8"><title>Day07. 正常一點的Django長這樣～</title><meta name="description" content="自我實現 自我成長！"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="/blog/style/common/bulma.css"><link rel="stylesheet" href="/blog/style/base.css"><link rel="stylesheet" href="/blog/style/common/helper.css"><script src="/blog/js/common.js"></script><link rel="stylesheet" href="/blog/style/post.css"><link rel="stylesheet" href="/blog/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/blog/style/common/jquery.fancybox.min.css"><script src="/blog/js/highlight.pack.js"></script><meta name="description" content="前言前幾篇我大概把我們一開始有用到的部分都挖了一遍（還有沒說到的部分），那我們可以繼續走下去，先把那個恐怖的Hello World！改成正常一點的吧！接著再看看今天會提到指令的原始碼～
+正題我前面把原先django-admin startproject iron_man001的urls.py改成了這樣
+from django.contrib import admin
+from django.urls import path
+
+from django.http import HttpResponse
+
+def hello(request):
+    return HttpResponse(&amp;quot;Hello World！&amp;quot;)
+
+urlpatterns = [
+    path(&amp;#x27;adm.."><meta name="generator" content="Hexo 7.0.0"><link rel="alternate" href="/blog/atom.xml" title="Shun Chih's blog" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/blog/">Shun Chih's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Day07. 正常一點的Django長這樣～</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">返回頂部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/blog/">首頁</a></h3><h3 class="is-inline-block"><a href="/blog/about">關於我</a></h3><h3 class="is-inline-block"><a href="/blog/archives">文章列表</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/blog/">首頁</a></h3><h3 class="is-inline-block"><a href="/blog/about">關於我</a></h3><h3 class="is-inline-block"><a href="/blog/archives">文章列表</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A3%E9%A1%8C"><span class="toc-text">正題</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AA%9E"><span class="toc-text">結語</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/blog/tags/django"><i class="tag post-item-tag">django</i></a><a href="/blog/tags/python"><i class="tag post-item-tag">python</i></a><a href="/blog/tags/15th%E9%90%B5%E4%BA%BA%E8%B3%BD"><i class="tag post-item-tag">15th鐵人賽</i></a><a href="/blog/tags/source%20code"><i class="tag post-item-tag">source code</i></a><a href="/blog/tags/web%20framework"><i class="tag post-item-tag">web framework</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Day07. 正常一點的Django長這樣～</h1><time class="has-text-grey" datetime="2023-09-22T13:53:12.000Z">2023-09-22</time><article class="mt-2 post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前幾篇我大概把我們一開始有用到的部分都挖了一遍（還有沒說到的部分），那我們可以繼續走下去，先把那個恐怖的Hello World！改成正常一點的吧！接著再看看今天會提到指令的原始碼～</p>
+<h2 id="正題"><a href="#正題" class="headerlink" title="正題"></a>正題</h2><p>我前面把原先<code>django-admin startproject iron_man001</code>的<code>urls.py</code>改成了這樣</p>
+<pre><code class="hljs python"><span class="hljs-keyword">from</span> django.contrib <span class="hljs-keyword">import</span> admin
+<span class="hljs-keyword">from</span> django.urls <span class="hljs-keyword">import</span> path
+
+<span class="hljs-keyword">from</span> django.http <span class="hljs-keyword">import</span> HttpResponse
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">hello</span>(<span class="hljs-params">request</span>):
+    <span class="hljs-keyword">return</span> HttpResponse(<span class="hljs-string">&quot;Hello World！&quot;</span>)
+
+urlpatterns = [
+    path(<span class="hljs-string">&#x27;admin/&#x27;</span>, admin.site.urls),
+    path(<span class="hljs-string">&#x27;&#x27;</span>, hello), 
+]</code></pre>
+<p>那今天我們先把view也就是hello function移出去吧！<br>先把terminal cd到有<code>manage.py</code>的資料夾，接著輸入<code>python manage.py startapp hello_app</code><br>此時會生成一個hello_app的資料夾，現在我們的資料夾長這樣</p>
+<p><img src="/blog/images/2023-09-22Day07.%E6%AD%A3%E5%B8%B8%E4%B8%80%E9%BB%9E%E7%9A%84Django%E9%95%B7%E9%80%99%E6%A8%A3%EF%BD%9E/201629057oRrXh1AbR.png"></p>
+<p>接下來新增<code>urls.py</code>到hello_app資料夾內並在裡面打出</p>
+<pre><code class="hljs python"><span class="hljs-keyword">from</span> django.urls <span class="hljs-keyword">import</span> path
+<span class="hljs-keyword">from</span> . <span class="hljs-keyword">import</span> views
+
+urlpatterns = [
+    path(<span class="hljs-string">&#x27;&#x27;</span>, views.hello),
+]</code></pre>
+<p>然後把<code>views.py</code>改成這樣</p>
+<pre><code class="hljs python"><span class="hljs-keyword">from</span> django.shortcuts <span class="hljs-keyword">import</span> render
+<span class="hljs-keyword">from</span> django.http <span class="hljs-keyword">import</span> HttpResponse
+
+<span class="hljs-comment"># Create your views here.</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">hello</span>(<span class="hljs-params">request</span>):
+    <span class="hljs-keyword">return</span> HttpResponse(<span class="hljs-string">&quot;Hello World！&quot;</span>)</code></pre>
+<p>接下來呢把iron_man001的<code>urls.py</code>改成這樣</p>
+<pre><code class="hljs python"><span class="hljs-keyword">from</span> django.contrib <span class="hljs-keyword">import</span> admin
+<span class="hljs-keyword">from</span> django.urls <span class="hljs-keyword">import</span> path, include
+
+urlpatterns = [
+    path(<span class="hljs-string">&#x27;admin/&#x27;</span>, admin.site.urls),
+    path(<span class="hljs-string">&#x27;&#x27;</span>, include(<span class="hljs-string">&quot;hello_app.urls&quot;</span>)), 
+]</code></pre>
+<p>最後把<code>settings.py</code>中的<code>INSTALLED_APPS</code>新增一個</p>
+<pre><code class="hljs python">INSTALLED_APPS = [
+    <span class="hljs-string">&#x27;hello_app.apps.HelloAppConfig&#x27;</span>, <span class="hljs-comment"># 新增這個</span>
+    <span class="hljs-string">&#x27;django.contrib.admin&#x27;</span>,
+    <span class="hljs-string">&#x27;django.contrib.auth&#x27;</span>,
+    <span class="hljs-string">&#x27;django.contrib.contenttypes&#x27;</span>,
+    <span class="hljs-string">&#x27;django.contrib.sessions&#x27;</span>,
+    <span class="hljs-string">&#x27;django.contrib.messages&#x27;</span>,
+    <span class="hljs-string">&#x27;django.contrib.staticfiles&#x27;</span>,
+]</code></pre>
+
+<p>這樣在runserver就可以看到我們寫的view function hello return 的字串囉～</p>
+<p><img src="/blog/images/2023-09-22Day07.%E6%AD%A3%E5%B8%B8%E4%B8%80%E9%BB%9E%E7%9A%84Django%E9%95%B7%E9%80%99%E6%A8%A3%EF%BD%9E/20162905A0aAxBD1bf.png"></p>
+<p>完美～我們終於完成了一個相對正常的Django了 XD</p>
+<p>接下來稍微看一下，<code>django-admin startproject</code>和<code>python manage.py startapp</code>這兩個指令，以及他是怎麼幫我們生成預設的檔案的呢？<br>相信我們對Django怎麼去讀CLI的階段已經很熟悉了，我們直接從commands中的<code>startproject.py</code>看起</p>
+<p><img src="/blog/images/2023-09-22Day07.%E6%AD%A3%E5%B8%B8%E4%B8%80%E9%BB%9E%E7%9A%84Django%E9%95%B7%E9%80%99%E6%A8%A3%EF%BD%9E/20162905frSKI6hEUK.png"></p>
+<p>看起來只有指定一些變數然後去跑父類別的handle了<br>我們來看看父類別<code>TemplateCommand</code><br>一開始會去驗證我們給予的project名稱是否合法</p>
+<p><img src="/blog/images/2023-09-22Day07.%E6%AD%A3%E5%B8%B8%E4%B8%80%E9%BB%9E%E7%9A%84Django%E9%95%B7%E9%80%99%E6%A8%A3%EF%BD%9E/20162905piCoozE3Lr.png"></p>
+<p>之後中間有些處理參數的過程後，到檔案處理的關卡</p>
+<p><img src="/blog/images/2023-09-22Day07.%E6%AD%A3%E5%B8%B8%E4%B8%80%E9%BB%9E%E7%9A%84Django%E9%95%B7%E9%80%99%E6%A8%A3%EF%BD%9E/20162905Dm1W1att1u.png"></p>
+<p>這邊實際去看看他變數的值，就可以看到原來django預設的那些檔案全都放在了這邊<br><code>django.conf</code>中的project_template和app_template<br>接著後面的處理流程就是把他們一個一個寫入我們指定的project’s name的資料夾中</p>
+<p><img src="/blog/images/2023-09-22Day07.%E6%AD%A3%E5%B8%B8%E4%B8%80%E9%BB%9E%E7%9A%84Django%E9%95%B7%E9%80%99%E6%A8%A3%EF%BD%9E/20162905AiZ1AdAyuZ.png"></p>
+<p>一個一個寫進去了呢～</p>
+<p>最後大致過程長下圖這樣</p>
+<p><img src="/blog/images/2023-09-22Day07.%E6%AD%A3%E5%B8%B8%E4%B8%80%E9%BB%9E%E7%9A%84Django%E9%95%B7%E9%80%99%E6%A8%A3%EF%BD%9E/20162905uR2aQLnjV2.png"></p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>今天大概看了一下Django產生檔案的過程，我原本一直以為他是寫在程式裡面動態一行一行生成，原來是有現成的檔案去copy，其實細看他也算是動態的寫進去了啦 XD</p>
+<p>那明後天來看看Django接收request的過程吧，我們自己寫的view function到底是怎麼接到request然後return response的呢！？</p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/blog/2023-09-23Day08.Request%E4%BE%86%E4%BA%86%EF%BC%81%E6%88%91%E6%8E%A5%EF%BC%81/" title="Day08. Request來了 ！ 我接！"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一頁: Day08. Request來了 ！ 我接！</span></a><a class="button is-default" href="/blog/2023-09-21Day06.settings%E6%B3%A8%E5%85%A5%EF%BC%81/" title="Day06. settings 注入！"><span class="has-text-weight-semibold">下一頁: Day06. settings 注入！</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="m124578n/blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/m124578n"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com/m23568n"><i class="iconfont icon-ins"></i></a><!-- RSS--><a title="rss" target="_blank" rel="noopener nofollow" href="/blog/atom.xml"><i class="iconfont icon-rss"></i></a><!-- 知乎--><!-- 领英--><a title="linkedin" target="_blank" rel="noopener nofollow" href="//www.linkedin.com/in/john19980215"><i class="iconfont icon-linkedin"></i></a><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/m23568n"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Shun Chih 2023</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/blog/js/jquery-3.6.1.min.js"></script><script src="/blog/js/jquery-fancybox.min.js"></script><script src="/blog/js/img_zoom.js"></script><script src="/blog/js/post.js"></script></body></html>
