@@ -31,7 +31,7 @@ user:
 # API config: https://utteranc.es/
 comment_utteranc:
   enable: true
-  repo: m124578n/blog # your blog repo
+  repo: m124578n/m124578n.github.io # your blog repo
 
 
 # documents: https://valine.js.org/quickstart.html

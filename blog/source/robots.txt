@@ -3,4 +3,4 @@ allow: /
 
 disallow: /images/
 
-sitemap: https://m124578n.github.io/blog/sitemap.xml
+sitemap: https://m124578n.github.io/sitemap.xml
