@@ -1,6 +1,3 @@
 user-agent: *
 allow: /
-
-disallow: /images/
-
 sitemap: https://m124578n.github.io/sitemap.xml
