@@ -1,0 +1,637 @@
+<!DOCTYPE html><html class="appearance-auto" lang="ch"><head><meta charset="UTF-8"><title>Python Uvicorn Asyncio探索</title><meta name="description" content="自我實現 自我成長！"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/style/common/jquery.fancybox.min.css"><script src="/js/highlight.pack.js"></script><meta name="description" content="
+起因在純函式咖啡每周三的podcast中講到的web framework benchmarks有著很多web framework的排行榜，那就好奇我大Python哪一個web framework是榜首呢～於是乎ctrl + F 搜尋下去就看到 uvicorn 228名，而我常用的django則是462名，那我就好奇uvicorn究竟是怎麼當python中的榜首的呢？就稍為的去了解了一下～
+UvicornUvicorn  The lightning-fast ASGI server.
+他是一個ASGI的web server，異步編程的server，所以嚴格說起來他並不是web framework，而且很容易迷路，且看到ASGI就會想到常用的WSGI，這兩者的差異就之後再說吧～
+而要了解uvicorn呢需要知.."><meta name="generator" content="Hexo 7.0.0"><link rel="alternate" href="/atom.xml" title="Shun Chih's blog" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Shun Chih's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Python Uvicorn Asyncio探索</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">返回頂部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首頁</a></h3><h3 class="is-inline-block"><a href="/about">關於我</a></h3><h3 class="is-inline-block"><a href="/archives">文章列表</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首頁</a></h3><h3 class="is-inline-block"><a href="/about">關於我</a></h3><h3 class="is-inline-block"><a href="/archives">文章列表</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B5%B7%E5%9B%A0"><span class="toc-text">起因</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Uvicorn"><span class="toc-text">Uvicorn</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Asyncio"><span class="toc-text">Asyncio</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#create-server"><span class="toc-text">create_server()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#server-forever"><span class="toc-text">server_forever()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#asyncio-run"><span class="toc-text">asyncio.run()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#uvicorn-server"><span class="toc-text">uvicorn server</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%84%9F%E6%83%B3"><span class="toc-text">感想</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/python"><i class="tag post-item-tag">python</i></a><a href="/tags/learning"><i class="tag post-item-tag">learning</i></a><a href="/tags/uvicorn"><i class="tag post-item-tag">uvicorn</i></a><a href="/tags/asyncio"><i class="tag post-item-tag">asyncio</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Python Uvicorn Asyncio探索</h1><time class="has-text-grey" datetime="2024-01-09T13:00:00.000Z">2024-01-09</time><article class="mt-2 post-content"><p><img src="/images/2024-01-09Python_Uvicorn_Asyncio%E6%8E%A2%E7%B4%A2/0_INO7Jg0oBMnOleAX.webp"></p>
+<h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>在純函式咖啡每周三的podcast中講到的web framework benchmarks有著很多web framework的排行榜，那就好奇我大Python哪一個web framework是榜首呢～於是乎ctrl + F 搜尋下去就看到 uvicorn 228名，而我常用的django則是462名，那我就好奇uvicorn究竟是怎麼當python中的榜首的呢？就稍為的去了解了一下～</p>
+<h1 id="Uvicorn"><a href="#Uvicorn" class="headerlink" title="Uvicorn"></a>Uvicorn</h1><p><a target="_blank" rel="noopener" href="https://www.uvicorn.org/">Uvicorn  The lightning-fast ASGI server.</a></p>
+<p>他是一個ASGI的web server，異步編程的server，所以嚴格說起來他並不是web framework，而且很容易迷路，且看到ASGI就會想到常用的WSGI，這兩者的差異就之後再說吧～</p>
+<p>而要了解uvicorn呢需要知道的項目有</p>
+<ul>
+<li>asyncio</li>
+<li>H11Protocol</li>
+</ul>
+<p>預設uvicorn main:app 是使用到H11Protocol，也支援</p>
+<ul>
+<li>HttpTools</li>
+<li>WS</li>
+<li>WebSocket</li>
+</ul>
+<p>而實際要起一個hello world的網站只需要簡單的</p>
+<pre><code class="hljs py"><span class="hljs-comment"># main.py</span>
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">app</span>(<span class="hljs-params">scope, receive, send</span>):
+    <span class="hljs-keyword">assert</span> scope[<span class="hljs-string">&#x27;type&#x27;</span>] == <span class="hljs-string">&#x27;http&#x27;</span>
+
+    <span class="hljs-keyword">await</span> send(&#123;
+        <span class="hljs-string">&#x27;type&#x27;</span>: <span class="hljs-string">&#x27;http.response.start&#x27;</span>,
+        <span class="hljs-string">&#x27;status&#x27;</span>: <span class="hljs-number">200</span>,
+        <span class="hljs-string">&#x27;headers&#x27;</span>: [
+            [<span class="hljs-string">b&#x27;content-type&#x27;</span>, <span class="hljs-string">b&#x27;text/plain&#x27;</span>],
+        ],
+    &#125;)
+    <span class="hljs-keyword">await</span> send(&#123;
+        <span class="hljs-string">&#x27;type&#x27;</span>: <span class="hljs-string">&#x27;http.response.body&#x27;</span>,
+        <span class="hljs-string">&#x27;body&#x27;</span>: <span class="hljs-string">b&#x27;Hello, world!&#x27;</span>,
+    &#125;)</code></pre>
+
+<p>之後執行 uvicorn main:app 就可以起一個網站了</p>
+<p><img src="/images/2024-01-09Python_Uvicorn_Asyncio%E6%8E%A2%E7%B4%A2/1_6M705790uavMCE1bGNQwcg.webp"></p>
+<p>在看看uvicorn之前我們先了解一下asyncio要起server怎麼做！</p>
+<h1 id="Asyncio"><a href="#Asyncio" class="headerlink" title="Asyncio"></a>Asyncio</h1><p><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/asyncio-stream.html">Streams</a></p>
+<p>跟著官方文件的範例來看看～可以稍微理解asyncio的server是怎麼運行的！</p>
+<pre><code class="hljs py"><span class="hljs-comment"># server.py</span>
+
+<span class="hljs-keyword">import</span> asyncio
+
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">EchoServerProtocol</span>(asyncio.Protocol):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">connection_made</span>(<span class="hljs-params">self, transport</span>):
+        peername = transport.get_extra_info(<span class="hljs-string">&#x27;peername&#x27;</span>)
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Connection from &#123;&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(peername))
+        self.transport = transport
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">data_received</span>(<span class="hljs-params">self, data</span>):
+        message = data.decode()
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Data received: &#123;!r&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(message))
+
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Send: &#123;!r&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(message))
+        self.transport.write(data)
+
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Close the client socket&#x27;</span>)
+        self.transport.close()
+
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():
+    <span class="hljs-comment"># Get a reference to the event loop as we plan to use</span>
+    <span class="hljs-comment"># low-level APIs.</span>
+    loop = asyncio.get_running_loop()
+
+    server = <span class="hljs-keyword">await</span> loop.create_server(
+        <span class="hljs-keyword">lambda</span>: EchoServerProtocol(),
+        <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-number">8888</span>)
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> server:
+        <span class="hljs-keyword">await</span> server.serve_forever()
+
+
+asyncio.run(main())</code></pre>
+<pre><code class="hljs py"><span class="hljs-comment"># client.py</span>
+
+<span class="hljs-keyword">import</span> asyncio
+
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">EchoClientProtocol</span>(asyncio.Protocol):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, message, on_con_lost</span>):
+        self.message = message
+        self.on_con_lost = on_con_lost
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">connection_made</span>(<span class="hljs-params">self, transport</span>):
+        transport.write(self.message.encode())
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Data sent: &#123;!r&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(self.message))
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">data_received</span>(<span class="hljs-params">self, data</span>):
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Data received: &#123;!r&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(data.decode()))
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">connection_lost</span>(<span class="hljs-params">self, exc</span>):
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;The server closed the connection&#x27;</span>)
+        self.on_con_lost.set_result(<span class="hljs-literal">True</span>)
+
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():
+    <span class="hljs-comment"># Get a reference to the event loop as we plan to use</span>
+    <span class="hljs-comment"># low-level APIs.</span>
+    loop = asyncio.get_running_loop()
+
+    on_con_lost = loop.create_future()
+    message = <span class="hljs-string">&#x27;Hello World!&#x27;</span>
+
+    transport, protocol = <span class="hljs-keyword">await</span> loop.create_connection(
+        <span class="hljs-keyword">lambda</span>: EchoClientProtocol(message, on_con_lost),
+        <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-number">8888</span>)
+
+    <span class="hljs-comment"># Wait until the protocol signals that the connection</span>
+    <span class="hljs-comment"># is lost and close the transport.</span>
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">await</span> on_con_lost
+    <span class="hljs-keyword">finally</span>:
+        transport.close()
+
+
+asyncio.run(main())</code></pre>
+
+<p>分別在不同的terminal執行程式 python XXX.py就能看到他們之間的互動</p>
+<p><img src="/images/2024-01-09Python_Uvicorn_Asyncio%E6%8E%A2%E7%B4%A2/1_p33U5AmXiDjEH2Krkiq6WA.webp"></p>
+<p><img src="/images/2024-01-09Python_Uvicorn_Asyncio%E6%8E%A2%E7%B4%A2/1_sGPdz9OxyA0oS119NgfeHA.webp"></p>
+<p>我們可以看到server和client都是跑在loop上面的，而這個EventLoop會是整個asyncio server中很重要的一個部分！</p>
+<p>loop分為 windows_events 和 unix_events，我是在windows上測試的所以所有物件都會由windows_events那邊生成～可以在asyncio _<em>init</em>_.py中看到</p>
+<pre><code class="hljs py"><span class="hljs-comment"># asyncio.__init__.py</span>
+
+<span class="hljs-keyword">if</span> sys.platform == <span class="hljs-string">&#x27;win32&#x27;</span>:  <span class="hljs-comment"># pragma: no cover</span>
+    <span class="hljs-keyword">from</span> .windows_events <span class="hljs-keyword">import</span> *
+    __all__ += windows_events.__all__
+<span class="hljs-keyword">else</span>:
+    <span class="hljs-keyword">from</span> .unix_events <span class="hljs-keyword">import</span> *  <span class="hljs-comment"># pragma: no cover</span>
+    __all__ += unix_events.__all__</code></pre>
+
+<p>而我們剛剛照著官網範例實作的loop會是ProactorEventLoop，可以在windows_events.py中找到該class，那就先來看看 <code>create_server()</code>的過程吧！</p>
+<h2 id="create-server"><a href="#create-server" class="headerlink" title="create_server()"></a>create_server()</h2><p>先找到ProactorEventLoop發現沒有create_server在往繼承上去找BaseProactorEventLoop，也發現沒有在往繼承上去找BaseEventLoop，找到create_server了</p>
+<pre><code class="hljs py"><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">create_server</span>(<span class="hljs-params"></span>
+<span class="hljs-params">        self, protocol_factory, host=<span class="hljs-literal">None</span>, port=<span class="hljs-literal">None</span>,</span>
+<span class="hljs-params">        *,</span>
+<span class="hljs-params">        family=socket.AF_UNSPEC,</span>
+<span class="hljs-params">        flags=socket.AI_PASSIVE,</span>
+<span class="hljs-params">        sock=<span class="hljs-literal">None</span>,</span>
+<span class="hljs-params">        backlog=<span class="hljs-number">100</span>,</span>
+<span class="hljs-params">        ssl=<span class="hljs-literal">None</span>,</span>
+<span class="hljs-params">        reuse_address=<span class="hljs-literal">None</span>,</span>
+<span class="hljs-params">        reuse_port=<span class="hljs-literal">None</span>,</span>
+<span class="hljs-params">        ssl_handshake_timeout=<span class="hljs-literal">None</span>,</span>
+<span class="hljs-params">        ssl_shutdown_timeout=<span class="hljs-literal">None</span>,</span>
+<span class="hljs-params">        start_serving=<span class="hljs-literal">True</span></span>):
+    <span class="hljs-string">&quot;&quot;&quot;Create a TCP server.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    The host parameter can be a string, in that case the TCP server is</span>
+<span class="hljs-string">    bound to host and port.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    The host parameter can also be a sequence of strings and in that case</span>
+<span class="hljs-string">    the TCP server is bound to all hosts of the sequence. If a host</span>
+<span class="hljs-string">    appears multiple times (possibly indirectly e.g. when hostnames</span>
+<span class="hljs-string">    resolve to the same IP address), the server is only bound once to that</span>
+<span class="hljs-string">    host.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Return a Server object which can be used to stop the service.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    This method is a coroutine.</span>
+<span class="hljs-string">    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(ssl, <span class="hljs-built_in">bool</span>):
+        <span class="hljs-keyword">raise</span> TypeError(<span class="hljs-string">&#x27;ssl argument must be an SSLContext or None&#x27;</span>)
+
+    <span class="hljs-keyword">if</span> ssl_handshake_timeout <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> ssl <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">raise</span> ValueError(
+            <span class="hljs-string">&#x27;ssl_handshake_timeout is only meaningful with ssl&#x27;</span>)
+
+    <span class="hljs-keyword">if</span> ssl_shutdown_timeout <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> ssl <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">raise</span> ValueError(
+            <span class="hljs-string">&#x27;ssl_shutdown_timeout is only meaningful with ssl&#x27;</span>)
+
+    <span class="hljs-keyword">if</span> sock <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+        _check_ssl_socket(sock)
+
+    <span class="hljs-keyword">if</span> host <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">or</span> port <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">if</span> sock <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+            <span class="hljs-keyword">raise</span> ValueError(
+                <span class="hljs-string">&#x27;host/port and sock can not be specified at the same time&#x27;</span>)
+
+        <span class="hljs-keyword">if</span> reuse_address <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+            reuse_address = os.name == <span class="hljs-string">&quot;posix&quot;</span> <span class="hljs-keyword">and</span> sys.platform != <span class="hljs-string">&quot;cygwin&quot;</span>
+        sockets = []
+        <span class="hljs-keyword">if</span> host == <span class="hljs-string">&#x27;&#x27;</span>:
+            hosts = [<span class="hljs-literal">None</span>]
+        <span class="hljs-keyword">elif</span> (<span class="hljs-built_in">isinstance</span>(host, <span class="hljs-built_in">str</span>) <span class="hljs-keyword">or</span>
+              <span class="hljs-keyword">not</span> <span class="hljs-built_in">isinstance</span>(host, collections.abc.Iterable)):
+            hosts = [host]
+        <span class="hljs-keyword">else</span>:
+            hosts = host
+
+        fs = [self._create_server_getaddrinfo(host, port, family=family,
+                                              flags=flags)
+              <span class="hljs-keyword">for</span> host <span class="hljs-keyword">in</span> hosts]
+        infos = <span class="hljs-keyword">await</span> tasks.gather(*fs)
+        infos = <span class="hljs-built_in">set</span>(itertools.chain.from_iterable(infos))
+
+        completed = <span class="hljs-literal">False</span>
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">for</span> res <span class="hljs-keyword">in</span> infos:
+                af, socktype, proto, canonname, sa = res
+                <span class="hljs-keyword">try</span>:
+                    sock = socket.socket(af, socktype, proto)
+                <span class="hljs-keyword">except</span> socket.error:
+                    <span class="hljs-comment"># Assume it&#x27;s a bad family/type/protocol combination.</span>
+                    <span class="hljs-keyword">if</span> self._debug:
+                        logger.warning(<span class="hljs-string">&#x27;create_server() failed to create &#x27;</span>
+                                       <span class="hljs-string">&#x27;socket.socket(%r, %r, %r)&#x27;</span>,
+                                       af, socktype, proto, exc_info=<span class="hljs-literal">True</span>)
+                    <span class="hljs-keyword">continue</span>
+                sockets.append(sock)
+                <span class="hljs-keyword">if</span> reuse_address:
+                    sock.setsockopt(
+                        socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="hljs-literal">True</span>)
+                <span class="hljs-keyword">if</span> reuse_port:
+                    _set_reuseport(sock)
+                <span class="hljs-comment"># Disable IPv4/IPv6 dual stack support (enabled by</span>
+                <span class="hljs-comment"># default on Linux) which makes a single socket</span>
+                <span class="hljs-comment"># listen on both address families.</span>
+                <span class="hljs-keyword">if</span> (_HAS_IPv6 <span class="hljs-keyword">and</span>
+                        af == socket.AF_INET6 <span class="hljs-keyword">and</span>
+                        <span class="hljs-built_in">hasattr</span>(socket, <span class="hljs-string">&#x27;IPPROTO_IPV6&#x27;</span>)):
+                    sock.setsockopt(socket.IPPROTO_IPV6,
+                                    socket.IPV6_V6ONLY,
+                                    <span class="hljs-literal">True</span>)
+                <span class="hljs-keyword">try</span>:
+                    sock.bind(sa)
+                <span class="hljs-keyword">except</span> OSError <span class="hljs-keyword">as</span> err:
+                    <span class="hljs-keyword">raise</span> OSError(err.errno, <span class="hljs-string">&#x27;error while attempting &#x27;</span>
+                                  <span class="hljs-string">&#x27;to bind on address %r: %s&#x27;</span>
+                                  % (sa, err.strerror.lower())) <span class="hljs-keyword">from</span> <span class="hljs-literal">None</span>
+            completed = <span class="hljs-literal">True</span>
+        <span class="hljs-keyword">finally</span>:
+            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> completed:
+                <span class="hljs-keyword">for</span> sock <span class="hljs-keyword">in</span> sockets:
+                    sock.close()
+    <span class="hljs-keyword">else</span>:
+        <span class="hljs-keyword">if</span> sock <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+            <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&#x27;Neither host/port nor sock were specified&#x27;</span>)
+        <span class="hljs-keyword">if</span> sock.<span class="hljs-built_in">type</span> != socket.SOCK_STREAM:
+            <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">f&#x27;A Stream Socket was expected, got <span class="hljs-subst">&#123;sock!r&#125;</span>&#x27;</span>)
+        sockets = [sock]
+
+    <span class="hljs-keyword">for</span> sock <span class="hljs-keyword">in</span> sockets:
+        sock.setblocking(<span class="hljs-literal">False</span>)
+
+    server = Server(self, sockets, protocol_factory,
+                    ssl, backlog, ssl_handshake_timeout,
+                    ssl_shutdown_timeout)
+    <span class="hljs-keyword">if</span> start_serving:
+        server._start_serving()
+        <span class="hljs-comment"># Skip one loop iteration so that all &#x27;loop.add_reader&#x27;</span>
+        <span class="hljs-comment"># go through.</span>
+        <span class="hljs-keyword">await</span> tasks.sleep(<span class="hljs-number">0</span>)
+
+    <span class="hljs-keyword">if</span> self._debug:
+        logger.info(<span class="hljs-string">&quot;%r is serving&quot;</span>, server)
+    <span class="hljs-keyword">return</span> server</code></pre>
+
+<p>當中有很多判斷點我們先略過，看他return的server為何～？</p>
+<pre><code class="hljs py">server = Server(self, sockets, protocol_factory,
+                      ssl, backlog, ssl_handshake_timeout,
+                      ssl_shutdown_timeout)</code></pre>
+
+<p>一個Server物件，再回到server.py看拿到server後的動作為</p>
+<h2 id="server-forever"><a href="#server-forever" class="headerlink" title="server_forever()"></a>server_forever()</h2><pre><code class="hljs py"><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():
+    <span class="hljs-comment"># Get a reference to the event loop as we plan to use</span>
+    <span class="hljs-comment"># low-level APIs.</span>
+    loop = asyncio.get_running_loop()
+
+    server = <span class="hljs-keyword">await</span> loop.create_server(
+        <span class="hljs-keyword">lambda</span>: EchoServerProtocol(),
+        <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-number">8888</span>)
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> server:
+        <span class="hljs-keyword">await</span> server.serve_forever()</code></pre>
+
+<pre><code class="hljs py"><span class="hljs-comment"># base_events.Server</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Server</span>(events.AbstractServer):
+
+<span class="hljs-comment"># ...</span>
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">serve_forever</span>(<span class="hljs-params">self</span>):
+    <span class="hljs-keyword">if</span> self._serving_forever_fut <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">raise</span> RuntimeError(
+            <span class="hljs-string">f&#x27;server <span class="hljs-subst">&#123;self!r&#125;</span> is already being awaited on serve_forever()&#x27;</span>)
+    <span class="hljs-keyword">if</span> self._sockets <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">f&#x27;server <span class="hljs-subst">&#123;self!r&#125;</span> is closed&#x27;</span>)
+
+    self._start_serving()
+    self._serving_forever_fut = self._loop.create_future()
+
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">await</span> self._serving_forever_fut
+    <span class="hljs-keyword">except</span> exceptions.CancelledError:
+        <span class="hljs-keyword">try</span>:
+            self.close()
+            <span class="hljs-keyword">await</span> self.wait_closed()
+        <span class="hljs-keyword">finally</span>:
+            <span class="hljs-keyword">raise</span>
+    <span class="hljs-keyword">finally</span>:
+        self._serving_forever_fut = <span class="hljs-literal">None</span>
+
+<span class="hljs-comment"># ...</span></code></pre>
+
+<p>關注在self._start_serving()上</p>
+<pre><code class="hljs py"><span class="hljs-comment"># base_events.Server</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Server</span>(events.AbstractServer):
+
+<span class="hljs-comment"># ...</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">_start_serving</span>(<span class="hljs-params">self</span>):
+    <span class="hljs-keyword">if</span> self._serving:
+        <span class="hljs-keyword">return</span>
+    self._serving = <span class="hljs-literal">True</span>
+    <span class="hljs-keyword">for</span> sock <span class="hljs-keyword">in</span> self._sockets:
+        sock.listen(self._backlog)
+        self._loop._start_serving(
+            self._protocol_factory, sock, self._ssl_context,
+            self, self._backlog, self._ssl_handshake_timeout,
+            self._ssl_shutdown_timeout)
+<span class="hljs-comment"># ...</span></code></pre>
+
+<p>接著看self._loop._start_serving()為何？別忘記這邊的self._loop唯一開始的ProactorEventLoop，所以要從這邊開始找，沒有在往繼承上面找，最後會在BaseProactorEventLoop中找到 _start_serving()</p>
+<pre><code class="hljs py"><span class="hljs-comment"># proactor_events.py BaseProactorEventLoop</span>
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">BaseProactorEventLoop</span>(base_events.BaseEventLoop):
+
+<span class="hljs-comment"># ...</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">_start_serving</span>(<span class="hljs-params">self, protocol_factory, sock,</span>
+<span class="hljs-params">                   sslcontext=<span class="hljs-literal">None</span>, server=<span class="hljs-literal">None</span>, backlog=<span class="hljs-number">100</span>,</span>
+<span class="hljs-params">                   ssl_handshake_timeout=<span class="hljs-literal">None</span>,</span>
+<span class="hljs-params">                   ssl_shutdown_timeout=<span class="hljs-literal">None</span></span>):
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">loop</span>(<span class="hljs-params">f=<span class="hljs-literal">None</span></span>):
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">if</span> f <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+                conn, addr = f.result()
+                <span class="hljs-keyword">if</span> self._debug:
+                    logger.debug(<span class="hljs-string">&quot;%r got a new connection from %r: %r&quot;</span>,
+                                 server, addr, conn)
+                protocol = protocol_factory()
+                <span class="hljs-keyword">if</span> sslcontext <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+                    self._make_ssl_transport(
+                        conn, protocol, sslcontext, server_side=<span class="hljs-literal">True</span>,
+                        extra=&#123;<span class="hljs-string">&#x27;peername&#x27;</span>: addr&#125;, server=server,
+                        ssl_handshake_timeout=ssl_handshake_timeout,
+                        ssl_shutdown_timeout=ssl_shutdown_timeout)
+                <span class="hljs-keyword">else</span>:
+                    self._make_socket_transport(
+                        conn, protocol,
+                        extra=&#123;<span class="hljs-string">&#x27;peername&#x27;</span>: addr&#125;, server=server)
+            <span class="hljs-keyword">if</span> self.is_closed():
+                <span class="hljs-keyword">return</span>
+            f = self._proactor.accept(sock)
+        <span class="hljs-keyword">except</span> OSError <span class="hljs-keyword">as</span> exc:
+            <span class="hljs-keyword">if</span> sock.fileno() != -<span class="hljs-number">1</span>:
+                self.call_exception_handler(&#123;
+                    <span class="hljs-string">&#x27;message&#x27;</span>: <span class="hljs-string">&#x27;Accept failed on a socket&#x27;</span>,
+                    <span class="hljs-string">&#x27;exception&#x27;</span>: exc,
+                    <span class="hljs-string">&#x27;socket&#x27;</span>: trsock.TransportSocket(sock),
+                &#125;)
+                sock.close()
+            <span class="hljs-keyword">elif</span> self._debug:
+                logger.debug(<span class="hljs-string">&quot;Accept failed on socket %r&quot;</span>,
+                             sock, exc_info=<span class="hljs-literal">True</span>)
+        <span class="hljs-keyword">except</span> exceptions.CancelledError:
+            sock.close()
+        <span class="hljs-keyword">else</span>:
+            self._accept_futures[sock.fileno()] = f
+            f.add_done_callback(loop)
+
+    self.call_soon(loop)
+<span class="hljs-comment"># ...</span></code></pre>
+
+<p>這邊最後的self.call_soon()會把該function物件丟到events.Handle並生成Handle物件，然後加到self._ready中，self._ready為collections.deque()，這邊我還沒有搞清楚什麼時候self._ready會被觸發！server繞了一圈被丟到self._ready中～</p>
+<h2 id="asyncio-run"><a href="#asyncio-run" class="headerlink" title="asyncio.run()"></a>asyncio.run()</h2><p>接著再切回來server.py中最後一行</p>
+<pre><code class="hljs py"><span class="hljs-comment"># server.py</span>
+
+asyncio.run(main())</code></pre>
+
+<p>asyncio啟動式</p>
+<pre><code class="hljs py"><span class="hljs-keyword">def</span> <span class="hljs-title function_">run</span>(<span class="hljs-params">main, *, debug=<span class="hljs-literal">None</span>, loop_factory=<span class="hljs-literal">None</span></span>):
+    <span class="hljs-string">&quot;&quot;&quot;Execute the coroutine and return the result.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    This function runs the passed coroutine, taking care of</span>
+<span class="hljs-string">    managing the asyncio event loop, finalizing asynchronous</span>
+<span class="hljs-string">    generators and closing the default executor.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    This function cannot be called when another asyncio event loop is</span>
+<span class="hljs-string">    running in the same thread.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    If debug is True, the event loop will be run in debug mode.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    This function always creates a new event loop and closes it at the end.</span>
+<span class="hljs-string">    It should be used as a main entry point for asyncio programs, and should</span>
+<span class="hljs-string">    ideally only be called once.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    The executor is given a timeout duration of 5 minutes to shutdown.</span>
+<span class="hljs-string">    If the executor hasn&#x27;t finished within that duration, a warning is</span>
+<span class="hljs-string">    emitted and the executor is closed.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Example:</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">        async def main():</span>
+<span class="hljs-string">            await asyncio.sleep(1)</span>
+<span class="hljs-string">            print(&#x27;hello&#x27;)</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">        asyncio.run(main())</span>
+<span class="hljs-string">    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> events._get_running_loop() <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-comment"># fail fast with short traceback</span>
+        <span class="hljs-keyword">raise</span> RuntimeError(
+            <span class="hljs-string">&quot;asyncio.run() cannot be called from a running event loop&quot;</span>)
+
+    <span class="hljs-keyword">with</span> Runner(debug=debug, loop_factory=loop_factory) <span class="hljs-keyword">as</span> runner:
+        <span class="hljs-keyword">return</span> runner.run(main)</code></pre>
+
+<p>會交由Runner去執行</p>
+<pre><code class="hljs py"><span class="hljs-comment"># runners.py Runner.run</span>
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Runner</span>:
+
+<span class="hljs-comment"># ...</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">run</span>(<span class="hljs-params">self, coro, *, context=<span class="hljs-literal">None</span></span>):
+    <span class="hljs-string">&quot;&quot;&quot;Run a coroutine inside the embedded event loop.&quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> coroutines.iscoroutine(coro):
+        <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&quot;a coroutine was expected, got &#123;!r&#125;&quot;</span>.<span class="hljs-built_in">format</span>(coro))
+
+    <span class="hljs-keyword">if</span> events._get_running_loop() <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-comment"># fail fast with short traceback</span>
+        <span class="hljs-keyword">raise</span> RuntimeError(
+            <span class="hljs-string">&quot;Runner.run() cannot be called from a running event loop&quot;</span>)
+
+    self._lazy_init()
+
+    <span class="hljs-keyword">if</span> context <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        context = self._context
+    task = self._loop.create_task(coro, context=context)
+
+    <span class="hljs-keyword">if</span> (threading.current_thread() <span class="hljs-keyword">is</span> threading.main_thread()
+        <span class="hljs-keyword">and</span> signal.getsignal(signal.SIGINT) <span class="hljs-keyword">is</span> signal.default_int_handler
+    ):
+        sigint_handler = functools.partial(self._on_sigint, main_task=task)
+        <span class="hljs-keyword">try</span>:
+            signal.signal(signal.SIGINT, sigint_handler)
+        <span class="hljs-keyword">except</span> ValueError:
+            <span class="hljs-comment"># `signal.signal` may throw if `threading.main_thread` does</span>
+            <span class="hljs-comment"># not support signals (e.g. embedded interpreter with signals</span>
+            <span class="hljs-comment"># not registered - see gh-91880)</span>
+            sigint_handler = <span class="hljs-literal">None</span>
+    <span class="hljs-keyword">else</span>:
+        sigint_handler = <span class="hljs-literal">None</span>
+
+    self._interrupt_count = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">return</span> self._loop.run_until_complete(task)
+    <span class="hljs-keyword">except</span> exceptions.CancelledError:
+        <span class="hljs-keyword">if</span> self._interrupt_count &gt; <span class="hljs-number">0</span>:
+            uncancel = <span class="hljs-built_in">getattr</span>(task, <span class="hljs-string">&quot;uncancel&quot;</span>, <span class="hljs-literal">None</span>)
+            <span class="hljs-keyword">if</span> uncancel <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> uncancel() == <span class="hljs-number">0</span>:
+                <span class="hljs-keyword">raise</span> KeyboardInterrupt()
+        <span class="hljs-keyword">raise</span>  <span class="hljs-comment"># CancelledError</span>
+    <span class="hljs-keyword">finally</span>:
+        <span class="hljs-keyword">if</span> (sigint_handler <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>
+            <span class="hljs-keyword">and</span> signal.getsignal(signal.SIGINT) <span class="hljs-keyword">is</span> sigint_handler
+        ):
+            signal.signal(signal.SIGINT, signal.default_int_handler)
+<span class="hljs-comment"># ...</span></code></pre>
+
+<p>把main()丟到task裡面後，交由self._loop.run_until_complete(task)，create_task和run_until_complete都在BaseEventLoop中被定義！</p>
+<pre><code class="hljs py"><span class="hljs-comment"># base_events.py BaseEventLoop</span>
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">BaseEventLoop</span>(events.AbstractEventLoop):
+
+<span class="hljs-comment"># ...</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">run_until_complete</span>(<span class="hljs-params">self, future</span>):
+    <span class="hljs-string">&quot;&quot;&quot;Run until the Future is done.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    If the argument is a coroutine, it is wrapped in a Task.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    WARNING: It would be disastrous to call run_until_complete()</span>
+<span class="hljs-string">    with the same coroutine twice -- it would wrap it in two</span>
+<span class="hljs-string">    different Tasks and that can&#x27;t be good.</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Return the Future&#x27;s result, or raise its exception.</span>
+<span class="hljs-string">    &quot;&quot;&quot;</span>
+    self._check_closed()
+    self._check_running()
+
+    new_task = <span class="hljs-keyword">not</span> futures.isfuture(future)
+    future = tasks.ensure_future(future, loop=self)
+    <span class="hljs-keyword">if</span> new_task:
+        <span class="hljs-comment"># An exception is raised if the future didn&#x27;t complete, so there</span>
+        <span class="hljs-comment"># is no need to log the &quot;destroy pending task&quot; message</span>
+        future._log_destroy_pending = <span class="hljs-literal">False</span>
+
+    future.add_done_callback(_run_until_complete_cb)
+    <span class="hljs-keyword">try</span>:
+        self.run_forever()
+    <span class="hljs-keyword">except</span>:
+        <span class="hljs-keyword">if</span> new_task <span class="hljs-keyword">and</span> future.done() <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> future.cancelled():
+            <span class="hljs-comment"># The coroutine raised a BaseException. Consume the exception</span>
+            <span class="hljs-comment"># to not log a warning, the caller doesn&#x27;t have access to the</span>
+            <span class="hljs-comment"># local task.</span>
+            future.exception()
+        <span class="hljs-keyword">raise</span>
+    <span class="hljs-keyword">finally</span>:
+        future.remove_done_callback(_run_until_complete_cb)
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> future.done():
+        <span class="hljs-keyword">raise</span> RuntimeError(<span class="hljs-string">&#x27;Event loop stopped before Future completed.&#x27;</span>)
+
+    <span class="hljs-keyword">return</span> future.result()
+<span class="hljs-comment"># ...</span></code></pre>
+
+<p>關注self.run_forever()，要再回頭看ProactorEventLoop中有沒有該function，有！</p>
+<pre><code class="hljs py"><span class="hljs-comment"># windowns_events.py ProactorEventLoop</span>
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">ProactorEventLoop</span>(proactor_events.BaseProactorEventLoop):
+    <span class="hljs-string">&quot;&quot;&quot;Windows version of proactor event loop using IOCP.&quot;&quot;&quot;</span>
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, proactor=<span class="hljs-literal">None</span></span>):
+        <span class="hljs-keyword">if</span> proactor <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+            proactor = IocpProactor()
+        <span class="hljs-built_in">super</span>().__init__(proactor)
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">run_forever</span>(<span class="hljs-params">self</span>):
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">assert</span> self._self_reading_future <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>
+            self.call_soon(self._loop_self_reading)
+            <span class="hljs-built_in">super</span>().run_forever()
+        <span class="hljs-keyword">finally</span>:
+            <span class="hljs-keyword">if</span> self._self_reading_future <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+                ov = self._self_reading_future._ov
+                self._self_reading_future.cancel()
+                <span class="hljs-comment"># self_reading_future was just cancelled so if it hasn&#x27;t been</span>
+                <span class="hljs-comment"># finished yet, it never will be (it&#x27;s possible that it has</span>
+                <span class="hljs-comment"># already finished and its callback is waiting in the queue,</span>
+                <span class="hljs-comment"># where it could still happen if the event loop is restarted).</span>
+                <span class="hljs-comment"># Unregister it otherwise IocpProactor.close will wait for it</span>
+                <span class="hljs-comment"># forever</span>
+                <span class="hljs-keyword">if</span> ov <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+                    self._proactor._unregister(ov)
+                self._self_reading_future = <span class="hljs-literal">None</span></code></pre>
+
+<p>super到BaseEventLoop的run_forever()</p>
+<pre><code class="hljs py"><span class="hljs-comment"># base_events.py BaseEventLoop</span>
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">BaseEventLoop</span>(events.AbstractEventLoop):
+
+<span class="hljs-comment"># ...</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">run_forever</span>(<span class="hljs-params">self</span>):
+    <span class="hljs-string">&quot;&quot;&quot;Run until stop() is called.&quot;&quot;&quot;</span>
+    self._check_closed()
+    self._check_running()
+    self._set_coroutine_origin_tracking(self._debug)
+
+    old_agen_hooks = sys.get_asyncgen_hooks()
+    <span class="hljs-keyword">try</span>:
+        self._thread_id = threading.get_ident()
+        sys.set_asyncgen_hooks(firstiter=self._asyncgen_firstiter_hook,
+                               finalizer=self._asyncgen_finalizer_hook)
+
+        events._set_running_loop(self)
+        <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+            self._run_once()
+            <span class="hljs-keyword">if</span> self._stopping:
+                <span class="hljs-keyword">break</span>
+    <span class="hljs-keyword">finally</span>:
+        self._stopping = <span class="hljs-literal">False</span>
+        self._thread_id = <span class="hljs-literal">None</span>
+        events._set_running_loop(<span class="hljs-literal">None</span>)
+        self._set_coroutine_origin_tracking(<span class="hljs-literal">False</span>)
+        sys.set_asyncgen_hooks(*old_agen_hooks)
+<span class="hljs-comment"># ...</span></code></pre>
+
+<p>這邊會設定events loop並一直執行裡面該有的任務，前面不知道的self._ready也會在self._run_once()當中被執行！</p>
+<p>到這邊大概能有個對asyncio server的一個概觀了～</p>
+<p>最後回頭來看看 uvicorn是怎麼運作的吧！</p>
+<h2 id="uvicorn-server"><a href="#uvicorn-server" class="headerlink" title="uvicorn server"></a>uvicorn server</h2><p>先找到uvicorn的位置吧，找到之後看看main.py</p>
+<p>參數有點多就不貼上來了，主要看看Server物件和該物件的run function！</p>
+<pre><code class="hljs py"><span class="hljs-comment"># uvicorn server.py Server</span>
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Server</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, config: Config</span>) -&gt; <span class="hljs-literal">None</span>:
+        self.config = config
+        self.server_state = ServerState()
+
+        self.started = <span class="hljs-literal">False</span>
+        self.should_exit = <span class="hljs-literal">False</span>
+        self.force_exit = <span class="hljs-literal">False</span>
+        self.last_notified = <span class="hljs-number">0.0</span>
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">run</span>(<span class="hljs-params">self, sockets: <span class="hljs-type">Optional</span>[<span class="hljs-type">List</span>[socket.socket]] = <span class="hljs-literal">None</span></span>) -&gt; <span class="hljs-literal">None</span>:
+        self.config.setup_event_loop()
+        <span class="hljs-keyword">return</span> asyncio.run(self.serve(sockets=sockets))</code></pre>
+
+<p>可以看到一開始先準備好event_loop後執行asyncio.run()，看看其中的self.serve()</p>
+<pre><code class="hljs py"><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">serve</span>(<span class="hljs-params">self, sockets: <span class="hljs-type">Optional</span>[<span class="hljs-type">List</span>[socket.socket]] = <span class="hljs-literal">None</span></span>) -&gt; <span class="hljs-literal">None</span>:
+    process_id = os.getpid()
+
+    config = self.config
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> config.loaded:
+        config.load()
+
+    self.lifespan = config.lifespan_class(config)
+
+    self.install_signal_handlers()
+
+    message = <span class="hljs-string">&quot;Started server process [%d]&quot;</span>
+    color_message = <span class="hljs-string">&quot;Started server process [&quot;</span> + click.style(<span class="hljs-string">&quot;%d&quot;</span>, fg=<span class="hljs-string">&quot;cyan&quot;</span>) + <span class="hljs-string">&quot;]&quot;</span>
+    logger.info(message, process_id, extra=&#123;<span class="hljs-string">&quot;color_message&quot;</span>: color_message&#125;)
+
+    <span class="hljs-keyword">await</span> self.startup(sockets=sockets)
+    <span class="hljs-keyword">if</span> self.should_exit:
+        <span class="hljs-keyword">return</span>
+    <span class="hljs-keyword">await</span> self.main_loop()
+    <span class="hljs-keyword">await</span> self.shutdown(sockets=sockets)
+
+    message = <span class="hljs-string">&quot;Finished server process [%d]&quot;</span>
+    color_message = <span class="hljs-string">&quot;Finished server process [&quot;</span> + click.style(<span class="hljs-string">&quot;%d&quot;</span>, fg=<span class="hljs-string">&quot;cyan&quot;</span>) + <span class="hljs-string">&quot;]&quot;</span>
+    logger.info(message, process_id, extra=&#123;<span class="hljs-string">&quot;color_message&quot;</span>: color_message&#125;)</code></pre>
+
+<p>在往下看self.startup()就能看到剛剛asyncio server.py那些部分啦！</p>
+<h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>uvicorn設定的部分還有很多，還沒有很熟悉就先到這邊了，對asyncio沒有很熟悉來看這些原始碼真的挺容易迷路的，不過稍微找一下還是能摸清楚大概的來龍去脈，也可以大致了解運行流程以及接收request的過程(這邊今天沒說到)，還可以跟django比較看看兩邊最大的差異點，聽有趣的，之後再來看看FastAPI的原始碼吧！！</p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2024-01-31DRF%E7%B7%B4%E7%BF%92%E8%B3%BC%E7%89%A9%E8%BB%8A%E7%B4%80%E9%8C%84-%E5%AE%A2%E8%A3%BD%E5%8C%96django%E7%9A%84User/" title="DRF練習購物車紀錄-客製化django的User"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一頁: DRF練習購物車紀錄-客製化django的User</span></a><a class="button is-default" href="/2024-01-07%E5%8E%BB%E5%B9%B4%E7%9A%84%E6%AA%A2%E8%A8%8E%E5%A0%B1%E5%91%8A%E6%9B%B8/" title="去年的檢討報告書"><span class="has-text-weight-semibold">下一頁: 去年的檢討報告書</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="m124578n/m124578n.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/m124578n"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com/m23568n"><i class="iconfont icon-ins"></i></a><!-- RSS--><a title="rss" target="_blank" rel="noopener nofollow" href="/atom.xml"><i class="iconfont icon-rss"></i></a><!-- 知乎--><!-- 领英--><a title="linkedin" target="_blank" rel="noopener nofollow" href="//www.linkedin.com/in/john19980215"><i class="iconfont icon-linkedin"></i></a><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/m23568n"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Shun Chih 2024</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/jquery-3.6.1.min.js"></script><script src="/js/jquery-fancybox.min.js"></script><script src="/js/img_zoom.js"></script><script src="/js/post.js"></script></body></html>
