@@ -5,6 +5,7 @@ tags:
   - python
   - learning
   - django
+  - django restframework
 categories:
   - 學習
 ---
