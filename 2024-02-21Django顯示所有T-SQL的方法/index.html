@@ -1,0 +1,140 @@
+<!DOCTYPE html><html class="appearance-auto" lang="ch"><head><meta charset="UTF-8"><title>Django顯示所有T-SQL的方法</title><meta name="description" content="自我實現 自我成長！"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/style/common/jquery.fancybox.min.css"><script src="/js/highlight.pack.js"></script><meta name="description" content="
+寫django的人應該或多或少都會使用ORM，而當ORM用太多怕忘記怎麼寫SQL或是想要優化無從下手，就該讓ORM幫我們組成的SQL現形啦！
+可以使用以下方式
+
+logging
+django-debug-toolbar
+connection
+
+前置作業先準備一個model Person
+# models.py
+from django.db import models
+
+# Create your models here.
+
+class Person(models.Model):
+    class Sex(models.IntegerChoices):
+        MALE = 0
+        FEMALE = 1
+        OTHERS = 2
+    name = models.Char.."><meta name="generator" content="Hexo 7.0.0"><link rel="alternate" href="/atom.xml" title="Shun Chih's blog" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Shun Chih's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Django顯示所有T-SQL的方法</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">返回頂部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首頁</a></h3><h3 class="is-inline-block"><a href="/about">關於我</a></h3><h3 class="is-inline-block"><a href="/archives">文章列表</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首頁</a></h3><h3 class="is-inline-block"><a href="/about">關於我</a></h3><h3 class="is-inline-block"><a href="/archives">文章列表</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%BD%AE%E4%BD%9C%E6%A5%AD"><span class="toc-text">前置作業</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#logging"><span class="toc-text">logging</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#django-debug-toolbar"><span class="toc-text">django-debug-toolbar</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#connection"><span class="toc-text">connection</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/django"><i class="tag post-item-tag">django</i></a><a href="/tags/python"><i class="tag post-item-tag">python</i></a><a href="/tags/django%20orm"><i class="tag post-item-tag">django orm</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Django顯示所有T-SQL的方法</h1><time class="has-text-grey" datetime="2024-02-21T03:30:00.000Z">2024-02-21</time><article class="mt-2 post-content"><p><img src="/images/2024-02-21Django%E9%A1%AF%E7%A4%BA%E6%89%80%E6%9C%89T-SQL%E7%9A%84%E6%96%B9%E6%B3%95/0_bc8v9wzbg2U72OHV.webp"></p>
+<p>寫django的人應該或多或少都會使用ORM，而當ORM用太多怕忘記怎麼寫SQL或是想要優化無從下手，就該讓ORM幫我們組成的SQL現形啦！</p>
+<p>可以使用以下方式</p>
+<ul>
+<li>logging</li>
+<li>django-debug-toolbar</li>
+<li>connection</li>
+</ul>
+<h2 id="前置作業"><a href="#前置作業" class="headerlink" title="前置作業"></a>前置作業</h2><p>先準備一個model Person</p>
+<pre><code class="hljs py"><span class="hljs-comment"># models.py</span>
+<span class="hljs-keyword">from</span> django.db <span class="hljs-keyword">import</span> models
+
+<span class="hljs-comment"># Create your models here.</span>
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Person</span>(models.Model):
+    <span class="hljs-keyword">class</span> <span class="hljs-title class_">Sex</span>(models.IntegerChoices):
+        MALE = <span class="hljs-number">0</span>
+        FEMALE = <span class="hljs-number">1</span>
+        OTHERS = <span class="hljs-number">2</span>
+    name = models.CharField(max_length=<span class="hljs-number">255</span>)
+    sex = models.IntegerField(choices=Sex.choices)
+
+    <span class="hljs-keyword">class</span> <span class="hljs-title class_">Meta</span>:
+        db_table = <span class="hljs-string">&quot;person&quot;</span></code></pre>
+
+<p>然後註冊進admin page</p>
+<pre><code class="hljs py"><span class="hljs-comment"># admin.py</span>
+<span class="hljs-keyword">from</span> django.contrib <span class="hljs-keyword">import</span> admin
+
+<span class="hljs-keyword">from</span> .models <span class="hljs-keyword">import</span> Person
+<span class="hljs-comment"># Register your models here.</span>
+
+admin.site.register(Person)</code></pre>
+
+<p>之後下</p>
+<ul>
+<li><p><code>python manage.py makemigrations</code></p>
+</li>
+<li><p><code>python manage.py migrate</code></p>
+</li>
+<li><p><code>python manage.py createsuperuser</code></p>
+</li>
+<li><p><code>python manage.py runserver</code></p>
+</li>
+</ul>
+<p>到 http:127.0.0.1:8000&#x2F;admin，輸入剛剛createsuperuser輸入的帳號密碼就可以看到下圖<br><img src="/images/2024-02-21Django%E9%A1%AF%E7%A4%BA%E6%89%80%E6%9C%89T-SQL%E7%9A%84%E6%96%B9%E6%B3%95/1_7m4MwVZGEJXhDpZzokVwHg.webp"></p>
+<h2 id="logging"><a href="#logging" class="headerlink" title="logging"></a>logging</h2><p>顯示SQL的時刻到了，只需要在settings.py中新增這些</p>
+<pre><code class="hljs py">LOGGING = &#123;
+    <span class="hljs-string">&#x27;version&#x27;</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">&#x27;disable_existing_loggers&#x27;</span>: <span class="hljs-literal">False</span>,
+    <span class="hljs-string">&#x27;formatters&#x27;</span>: &#123;
+        <span class="hljs-string">&#x27;simple&#x27;</span>: &#123;
+            <span class="hljs-string">&#x27;format&#x27;</span>: <span class="hljs-string">&#x27;[&#123;levelname&#125;] [&#123;asctime&#125;] &#123;message&#125;&#x27;</span>,
+            <span class="hljs-string">&#x27;style&#x27;</span>: <span class="hljs-string">&#x27;&#123;&#x27;</span>
+        &#125;,
+    &#125;,
+    <span class="hljs-string">&#x27;handlers&#x27;</span>: &#123;
+        <span class="hljs-string">&#x27;console&#x27;</span>:&#123;
+            <span class="hljs-string">&#x27;level&#x27;</span>:<span class="hljs-string">&#x27;DEBUG&#x27;</span>,
+            <span class="hljs-string">&#x27;class&#x27;</span>:<span class="hljs-string">&#x27;logging.StreamHandler&#x27;</span>,
+            <span class="hljs-string">&#x27;formatter&#x27;</span>: <span class="hljs-string">&#x27;simple&#x27;</span>,
+        &#125;,
+    &#125;,
+    <span class="hljs-string">&#x27;loggers&#x27;</span>: &#123;
+        <span class="hljs-string">&#x27;django.db.backends&#x27;</span>: &#123;
+            <span class="hljs-string">&#x27;handlers&#x27;</span>: [<span class="hljs-string">&#x27;console&#x27;</span>],
+            <span class="hljs-string">&#x27;propagate&#x27;</span>: <span class="hljs-literal">True</span>,
+            <span class="hljs-string">&#x27;level&#x27;</span>:<span class="hljs-string">&#x27;DEBUG&#x27;</span>,
+        &#125;,
+    &#125;
+&#125;</code></pre>
+<ul>
+<li>formatters 是在format顯現的格式</li>
+<li>handlers 是指定處理器</li>
+<li>loggers 是選擇要記錄log的範圍</li>
+</ul>
+<p>接著到admin page新增user，就能在很亂的console中獲得剛剛新增的SQL<br><img src="/images/2024-02-21Django%E9%A1%AF%E7%A4%BA%E6%89%80%E6%9C%89T-SQL%E7%9A%84%E6%96%B9%E6%B3%95/1_x0cgOa5kNVSDwB446tNuDw.webp"></p>
+<h2 id="django-debug-toolbar"><a href="#django-debug-toolbar" class="headerlink" title="django-debug-toolbar"></a>django-debug-toolbar</h2><p>接著是更方便查閱的套件 debug-toolbar</p>
+<p><code>pip install django-debug-toolbar</code></p>
+<p>安裝完後在settings.py中插入這些</p>
+<pre><code class="hljs py">INSTALLED_APPS = [
+    <span class="hljs-comment"># ....</span>
+    <span class="hljs-string">&#x27;debug_toolbar&#x27;</span>,
+]
+
+<span class="hljs-keyword">if</span> DEBUG:
+    MIDDLEWARE.insert(<span class="hljs-number">0</span>,  <span class="hljs-string">&#x27;debug_toolbar.middleware.DebugToolbarMiddleware&#x27;</span>)
+
+INTERNAL_IPS = [
+    <span class="hljs-string">&quot;127.0.0.1&quot;</span>,
+]</code></pre>
+<p>並且在urls.py中加入</p>
+<pre><code class="hljs py"><span class="hljs-keyword">if</span> DEBUG:
+    <span class="hljs-keyword">import</span> debug_toolbar
+    urlpatterns += [path(<span class="hljs-string">&#x27;__debug__/&#x27;</span>, include(debug_toolbar.urls))]</code></pre>
+<p>回到admin page就能看到toolbar囉<br><img src="/images/2024-02-21Django%E9%A1%AF%E7%A4%BA%E6%89%80%E6%9C%89T-SQL%E7%9A%84%E6%96%B9%E6%B3%95/1_PfznRk7i7ZV42l9Pq76bOw.webp"></p>
+<p>而debug toolbar當今天views是回傳JsonResponse的話不會觸發，畢竟他會需要render出toolbar頁面</p>
+<h2 id="connection"><a href="#connection" class="headerlink" title="connection"></a>connection</h2><p>直接在目標view插入connection</p>
+<pre><code class="hljs py"><span class="hljs-comment"># views.py</span>
+<span class="hljs-keyword">from</span> django.shortcuts <span class="hljs-keyword">import</span> render
+<span class="hljs-keyword">from</span> .models <span class="hljs-keyword">import</span> Person
+<span class="hljs-keyword">from</span> django.db <span class="hljs-keyword">import</span> connection
+<span class="hljs-comment"># Create your views here.</span>
+
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">person</span>(<span class="hljs-params">request</span>):
+    context = &#123;&#125;
+    persons = Person.objects.<span class="hljs-built_in">all</span>()
+    context[<span class="hljs-string">&#x27;persons&#x27;</span>] = <span class="hljs-built_in">list</span>(persons.values())
+    <span class="hljs-built_in">print</span>(connection.queries)
+    <span class="hljs-built_in">print</span>(persons.query)
+    <span class="hljs-keyword">return</span> render(request, <span class="hljs-string">&#x27;index.html&#x27;</span>, context)</code></pre>
+<ul>
+<li><p>connection.queries 會顯示執行過的SQL語句</p>
+</li>
+<li><p>persons.query 則是顯示當前ORM的SQL（僅限select）</p>
+</li>
+</ul>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><em></em><a class="button is-default" href="/2024-02-20DRF%E7%B7%B4%E7%BF%92-%E5%AE%A2%E8%A3%BD%E5%8C%96User/" title="DRF練習-客製化User"><span class="has-text-weight-semibold">下一頁: DRF練習-客製化User</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="m124578n/m124578n.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/m124578n"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com/m23568n"><i class="iconfont icon-ins"></i></a><!-- RSS--><a title="rss" target="_blank" rel="noopener nofollow" href="/atom.xml"><i class="iconfont icon-rss"></i></a><!-- 知乎--><!-- 领英--><a title="linkedin" target="_blank" rel="noopener nofollow" href="//www.linkedin.com/in/john19980215"><i class="iconfont icon-linkedin"></i></a><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com/m23568n"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Shun Chih 2024</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/jquery-3.6.1.min.js"></script><script src="/js/jquery-fancybox.min.js"></script><script src="/js/img_zoom.js"></script><script src="/js/post.js"></script></body></html>
