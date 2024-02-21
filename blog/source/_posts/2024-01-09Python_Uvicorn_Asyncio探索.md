@@ -722,4 +722,4 @@ async def serve(self, sockets: Optional[List[socket.socket]] = None) -> None:
 在往下看self.startup()就能看到剛剛asyncio server.py那些部分啦！
 
 # 感想
-uvicorn設定的部分還有很多，還沒有很熟悉就先到這邊了，對asyncio沒有很熟悉來看這些原始碼真的挺容易迷路的，不過稍微找一下還是能摸清楚大概的來龍去脈，也可以大致了解運行流程以及接收request的過程(這邊今天沒說到)，還可以跟django比較看看兩邊最大的差異點，聽有趣的，之後再來看看FastAPI的原始碼吧！！
+uvicorn設定的部分還有很多，還沒有很熟悉就先到這邊了，對asyncio沒有很熟悉來看這些原始碼真的挺容易迷路的，不過稍微找一下還是能摸清楚大概的來龍去脈，也可以大致了解運行流程以及接收request的過程(這邊今天沒說到)，還可以跟django比較看看兩邊最大的差異點，之後再來看看FastAPI的原始碼吧！！
