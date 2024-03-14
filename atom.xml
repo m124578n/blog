@@ -6,7 +6,7 @@
   <link href="https://m124578n.github.io/atom.xml" rel="self"/>
   
   <link href="https://m124578n.github.io/"/>
-  <updated>2024-02-29T07:32:10.899Z</updated>
+  <updated>2024-03-14T03:56:06.222Z</updated>
   <id>https://m124578n.github.io/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>開發日文五十音練習網站</title>
+    <link href="https://m124578n.github.io/2024-03-14%E9%96%8B%E7%99%BC%E6%97%A5%E6%96%87%E4%BA%94%E5%8D%81%E9%9F%B3%E7%B7%B4%E7%BF%92%E7%B6%B2%E7%AB%99/"/>
+    <id>https://m124578n.github.io/2024-03-14%E9%96%8B%E7%99%BC%E6%97%A5%E6%96%87%E4%BA%94%E5%8D%81%E9%9F%B3%E7%B7%B4%E7%BF%92%E7%B6%B2%E7%AB%99/</id>
+    <published>2024-03-14T03:47:00.000Z</published>
+    <updated>2024-03-14T03:56:06.222Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/2024-03-14%E9%96%8B%E7%99%BC%E6%97%A5%E6%96%87%E4%BA%94%E5%8D%81%E9%9F%B3%E7%B7%B4%E7%BF%92%E7%B6%B2%E7%AB%99/1_YuIpjHE0PKu8x0UpgikWGw.webp"></p><p>連結在此 : <a href="https://japanese-practice.fly.dev/">五十音練習網站</a><br>目前部署在 <a href="https://fly.io/">fly.io</a> 上</p><h1 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h1><p>友人說最近想學學日文目前稍微知道幾個單字都聽得懂會說但就是看不懂不知道日文五十音，於是乎我就想說做一個可以練習的網站讓他玩玩認識認識日本的五十音～</p><h1 id="規劃"><a href="#規劃" class="headerlink" title="規劃"></a>規劃</h1><p>既然都要開發了內容大概就是簡單的打字練習，知道每個日文字是怎麼發音或怎麼用羅馬拼音打出來，後面還想接Google api去把每個日文字怎麼念給播放出來（還沒做），越想越多越想越複雜，此時覺得不要想那麼多了先做個初版出來，而開發部分就想說平常都用Django，不然就來練習Flask吧！</p><h1 id="開發"><a href="#開發" class="headerlink" title="開發"></a>開發</h1><p>花了1, 2個小時的時間摸索Flask兼開發弄了個初版，初版只有練習區沒有計時賽，自己一個寫寫寫測測測～摁～都沒什麼毛病，然後再花一點時間部署到fly.io，丟給朋友玩玩</p><p>我：AA~我弄了一個可以練習五十音的你玩玩～<br>友：好喔，感謝！<br>１分鐘後<br>友：ㄟ你那個有問題，我明明答對卻說我是錯的<br>我：讓我來看看</p><p>馬上就收到回饋說我明明打對他卻說我錯的！！摁～趕緊檢查發現程式bug，現階段沒用DB去存都讀取同一個物件，所以有兩個人使用就會出問題XDD，而這時開發到一半的時候就打算加計時的部分，外加紀錄練習過的字，所以話不多說趕緊弄個簡單的DB吧～DB就用SQLite3方便就好，Flask-SQLAlchemy，Flask-Migrate弄一弄發現最新版跟網路上查到的資料有些出入document看一看，寫寫寫到fly.io部署的時候</p><pre><code class="hljs bash">ModuleNotFoundError: No module named <span class="hljs-string">&#x27;_sqlite3&#x27;</span> on a Python Flask application</code></pre><p>挖哩fly.io部署都交給他了跳出這個，趕緊Google找解法，幸虧這問題很常見很快就有解答</p><p><a href="https://community.fly.io/t/modulenotfounderror-no-module-named-sqlite3-on-a-python-flask-application/9487">ModuleNotFoundError: No module named ‘_sqlite3’ on a Python Flask application</a></p><p>解完成功部署後再丟一次連結給友人</p><p>我：AA，改好了你再試試<br>友：好<br>１分鐘後<br>友：你這個跳錯誤訊息耶，我看不懂<br>我：！！，我瞧瞧</p><p>不出意外馬上就要出意外了，抱錯500，去看fly.io後台給的log這時我才發現怎麼有兩台machine在run我不是只起一個app嗎？趕緊再去求助Google大神，很快就發現fly.io為了要維持高可用HA的關係預設會啟用兩台機器，我SQLite3目前還沒有移出來都跟著Flask這樣整包跑難怪會出問題，但目前我也不打算移出來把資料另外放，fly.io也有mount的功能，不過我目前最主要的需求是讓他正常運作，於是乎我把fly.io原始HA的設定弄掉改成一台就好，fly deploy完後丟給友人</p><p>我：AA，這次穩了你玩玩<br>友：好<br>１分鐘後<br>友：可以了可以了水喔<br>我：讚，再來開發計時賽再加個排行榜<br>友：排名有獎品喔？<br>我：當然沒有ＸＤＤ</p><p>到這邊終於把初版弄完了，而計時賽跟排行榜的開發就沒什麼問題很順利的寫完～</p><h1 id="最後"><a href="#最後" class="headerlink" title="最後"></a>最後</h1><p>Flask一開始是只有一個app.py，後面也把他拆開來寫成flask factory的樣子，不然一個app後續要修改還新增寫到一半就感受到了，過程中當然就是Google＋ChatGPT，雙重導師下開發其實沒什麼難度，想清楚再做就OK了，未來還有想要串前面提到的Google api TTS可以把文字變成語音，然後串ChatGPT api弄自動生成日文文章練習打字，當然目前想都可以想，做好也不知道什麼時候了～而且這樣串不知道會收多少$$</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/2024-03-14%E9%96%8B%E7%99%BC%E6%97%A5%E6%96%87%E4%BA%94%E5%8D%81%E9%9F%B3%E7%B7%B4%E7%BF%92%E7%B6%B2%E7%AB%99/1_YuIpjHE</summary>
+      
+    
+    
+    
+    <category term="學習" scheme="https://m124578n.github.io/categories/%E5%AD%B8%E7%BF%92/"/>
+    
+    
+    <category term="python" scheme="https://m124578n.github.io/tags/python/"/>
+    
+    <category term="flask" scheme="https://m124578n.github.io/tags/flask/"/>
+    
+    <category term="japanese" scheme="https://m124578n.github.io/tags/japanese/"/>
+    
+  </entry>
   
   <entry>
     <title>滲透測試 vs 弱點掃描</title>
@@ -591,38 +619,6 @@
       
       
     <summary type="html">&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;昨天我們看到了print ORM回傳的值，實際上會去觸發到SQL，那正常在使用的情況下又是什麼時候被觸發的呢！？根據debug toolba</summary>
-      
-    
-    
-    
-    <category term="15th鐵人賽" scheme="https://m124578n.github.io/categories/15th%E9%90%B5%E4%BA%BA%E8%B3%BD/"/>
-    
-    
-    <category term="django" scheme="https://m124578n.github.io/tags/django/"/>
-    
-    <category term="python" scheme="https://m124578n.github.io/tags/python/"/>
-    
-    <category term="15th鐵人賽" scheme="https://m124578n.github.io/tags/15th%E9%90%B5%E4%BA%BA%E8%B3%BD/"/>
-    
-    <category term="source code" scheme="https://m124578n.github.io/tags/source-code/"/>
-    
-    <category term="web framework" scheme="https://m124578n.github.io/tags/web-framework/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Day23. ORM觸發SQL的地方（這邊是print～）</title>
-    <link href="https://m124578n.github.io/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/"/>
-    <id>https://m124578n.github.io/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/</id>
-    <published>2023-10-08T07:30:13.000Z</published>
-    <updated>2023-12-22T08:27:40.412Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>昨天那邊我推測Todo只有在他被動作的時候才會去connect DB，所以真的在被使用的地方照昨天的寫法會是在render的時候！但今天先來看看print</p><h2 id="正題"><a href="#正題" class="headerlink" title="正題"></a>正題</h2><p>首先先稍微驗證一下想法是不是正確的，觸發SQL的是<code>print(todo)</code>，那在python中什麼會被print()觸發呢！？答案是magic method <code>__repr__</code> or <code>__str__</code></p><p>那我們接著來看ORM filter回傳的type是什麼<br><code>&lt;class &#39;django.db.models.query.QuerySet&#39;&gt;</code><br>是這個QueruSet類別，這個我們昨天也有看到，那邊其實我到現在都還沒有很有把握說我懂了…<br>總之跟著這個類別下去找<code>__repr__</code> or <code>__str__</code>這兩個magic method</p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905N8YfursOAa.png"></p><p>這邊看到會顯示出data，到表已經從db中拿到data了！<br>所以我們要再根據這個線索看看取得data是透過什麼方式！<br>這邊可以看到他對自己做slice取值<code>self[: REPR_OUTPUT_SIZE + 1]</code><br>而這個動作又會觸發什麼magic method呢！？google一下～<br>找到啦～是<code>__getitem__</code>那我們接著看看他會做什麼～</p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905Jsj1jJ56T5.png"></p><p>我們可以知道k是slice物件，所以會流向這邊</p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905oQOnlVyg0i.png"></p><p>我這邊看了一下qs.query已經是組好的SQL了，尚未看到他怎麼組出來的～<br>而這邊有一個<code>list(qs)</code>，這個會觸發magic method <code>__iter__</code></p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905ythIUszZoD.png"></p><p>在根據上圖的function找</p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905Bfw4hXgGMk.png"></p><p>一樣找線索</p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905DOaUo8RWaP.png"></p><p>一樣找list的magic method <code>__iter__</code></p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905QwGhN8nyYH.png"></p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905rc1g7W4f9O.png"></p><p>這邊就不細看了，粗看一下可以看到去執行SQL的地方～<br>先找query，直接print他的type看～<br>是在<code>django.db.models.sql.query.Query</code></p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905BT4wpYihVw.png"></p><p>那這邊的connections我們也很熟悉了，他就是<code>DatabaseWrapper</code><br>其中的ops.compiler呢～</p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905M5ua8fjq21.png"></p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905VGdjNn5rO6.png"></p><p><img src="/images/2023-10-08Day23.ORM%E8%A7%B8%E7%99%BCSQL%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%88%E9%80%99%E9%82%8A%E6%98%AFprint%EF%BD%9E%EF%BC%89/20162905kpsWqaQekO.png"></p><p>這下就找到compiler本人囉！<br>最後到compiler中的execute_sql就可以看到他與db連接的地方囉～</p><h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>就這樣挖著挖著就挖到與db連接的地方了，有很多python magic method如果沒接觸過python的可能會看不太習慣，不過還沒看到怎麼組出SQL了的地方就是了，是有看到類似的地方，看了一眼我就先當作沒看到了XD</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;昨天那邊我推測Todo只有在他被動作的時候才會去connect DB，所以真的在被使用的地方照昨天的寫法會是在render的時候！但今天先來</summary>
       
     
     
